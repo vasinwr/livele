@@ -1,0 +1,11 @@
+Live Lecture feedback Webapp
+
+Idea :
+- live feedback as the lecture proceeds
+- mood voting system, let the lecturer know if the class understands, if it's going too fast or too slow, etc 
+- anonymous question submission during lecture, (chatroom?)
+- synchronized slide display
+- students can write notes along 
+- summary of the lecture can be uploaded/downloaded
+- user accounts for students/lecturers, allowing access to corresponding classes, and save their own notes and questions
+- pc and mobile compatible
