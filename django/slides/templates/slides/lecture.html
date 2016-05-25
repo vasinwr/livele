@@ -1,0 +1,55 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Lecture</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'slides/css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{% static 'slides/css/lumen.css' %}" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="{% static 'slides/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
+</head>
+
+<body id="page-top" class="index">
+    <h1>Slide</h1>
+    <img src="{{ slide.img_source }}" height='350' width='500'>
+
+    {% if lecturer %}
+    <a href="{% url 'slides:previous page' %}" class="btn btn-primary btn-lg">previous</a>
+    <a href="{% url 'slides:next page' %}" class="btn btn-primary btn-lg">next</a>
+    {% endif %}
+    {% if student %}
+    <a href="#" class="btn btn-warning"><i class="fa fa-frown-o fa-3x" aria-hidden="true"></i></a>
+    <a href="{% url 'slides:vote' %}" class="btn btn-danger"><i class="fa fa-frown-o fa-3x" aria-hidden="true"></i></a>
+    {% endif %}
+
+    <h4>Current class status</h4>
+    <div class="progress progress-striped active">
+        <div class="progress-bar progress-bar-danger" style="width: {{ votes_amplified }}%"></div>
+        <div class="progress-bar progress-bar-warning" style="width: 0%"></div>
+        <div class="progress-bar progress-bar-success" style="width: {{ votes_rest }}%"></div>
+    </div>        
+    <!-- jQuery -->
+    <script src="{% static 'slides/js/jquery.js' %}"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{% static 'slides/js/bootstrap.min.js' %}"></script>
+
+
+</body>
+
+</html>
