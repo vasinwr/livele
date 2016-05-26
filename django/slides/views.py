@@ -25,15 +25,20 @@ def lecture(request, isLecturer):
     return render(request, 'slides/index.html', {'slide': slide})
     '''
     current_slide = get_object_or_404(Slides, pk=current.page)
-    try:
-	myvote = Votes.objects.get(user = request.user, slide = current_slide)
-    except Votes.DoesNotExist:
-	v = Votes(user = request.user, slide = current_slide, value = 0)
-    	v.save()
+    if(isLecturer=='0'):
+	try:
+	    myvote = Votes.objects.get(user = request.user, slide = current_slide)
+	except Votes.DoesNotExist:
+	    v = Votes(user = request.user, slide = current_slide, value = 0)
+    	    v.save()
+
     good = Votes.objects.filter(slide = current_slide, value = 0).count()
     bad = Votes.objects.filter(slide = current_slide, value = 1).count()
     total = good + bad
     if(isLecturer=='1'):
+	if (total == 0):
+	    total = 1
+	    good = 1
         return render(request, 'slides/lecture.html', {'slide':current_slide, 'lecturer':True, 'votes_amplified':bad *100 / total,
                                                        'votes_rest': good*100/total})
     else:
@@ -69,12 +74,15 @@ def vote_up(request):
     return render(request, 'slides/index.html', {'slide': slide})
     '''
     current_slide = get_object_or_404(Slides, pk=current.page)
-    current_user = request.user
-#    current_slide.votes += 1
-#    current_slide.save()
-    Votes.objects.filter(user = current_user, slide = current_slide).delete()
-    v = Votes(user = current_user, slide = current_slide, value = 0)
-    v.save()
+
+    try:
+	v = Votes.objects.get(user = request.user, slide = current_slide)
+	v.value = 0
+	v.save()
+    except Votes.DoesNotExist:
+	v = Votes(user = request.user, slide = current_slide, value = 0)
+    	v.save()
+
     return HttpResponseRedirect(reverse('slides:lecture', args=[0]))
 
 def vote_down(request):
@@ -86,12 +94,13 @@ def vote_down(request):
     return render(request, 'slides/index.html', {'slide': slide})
     '''
     current_slide = get_object_or_404(Slides, pk=current.page)
-    current_user = request.user
-#    current_slide.votes += 1
-#    current_slide.save()
-    Votes.objects.filter(user = current_user, slide = current_slide).delete()
-    v = Votes(user = current_user, slide = current_slide, value = 1)
-    v.save()
+    try:
+	v = Votes.objects.get(user = request.user, slide = current_slide)
+	v.value = 1
+	v.save()
+    except Votes.DoesNotExist:
+	v = Votes(user = request.user, slide = current_slide, value = 1)
+    	v.save()
     return HttpResponseRedirect(reverse('slides:lecture', args=[0]))
 
 def login(request):
