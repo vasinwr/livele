@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
-
+from django.contrib.auth import authenticate, login
 from .models import Current, Slides
 
 # Create your views here.
@@ -34,16 +34,21 @@ def lecture(request, isLecturer):
 def next_page(request):
     current = get_object_or_404(Current, pk=1)
     try:
-	slide = Slides.objects.get(page = current + 1)
+	slide = Slides.objects.get(page = current.page + 1)
 	current.page += 1
 	current.save()
     except Slides.DoesNotExist:
+	pass
     return HttpResponseRedirect(reverse('slides:lecture', args=[1]))
 
 def prev_page(request):
     current = get_object_or_404(Current, pk=1)
-    current.page -= 1
-    current.save()
+    try:
+	slide = Slides.objects.get(page = current.page - 1)
+	current.page -= 1
+	current.save()
+    except Slides.DoesNotExist:
+	pass
     return HttpResponseRedirect(reverse('slides:lecture', args=[1]))
 
 def vote_current(request):
@@ -58,3 +63,15 @@ def vote_current(request):
     current_slide.votes += 1
     current_slide.save()
     return HttpResponseRedirect(reverse('slides:lecture', args=[0]))
+
+def my_view(request):
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        if user.is_active:
+            login(request, user)
+	else:
+	    return render(request, 'slides/login.html')
+    else:
+	return render(request, 'slides/index.html')
