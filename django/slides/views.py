@@ -64,15 +64,21 @@ def vote_current(request):
     current_slide.save()
     return HttpResponseRedirect(reverse('slides:lecture', args=[0]))
 
-def my_view(request):
-    username = request.POST['username']
-    password = request.POST['password']
+def login(request):
+    return render(request, 'slides/login.html') 
+
+def login_user(request):
+    username = request.POST.get('username')
+    password = request.POST.get('password')
     user = authenticate(username=username, password=password)
     if user is not None:
         if user.is_active:
             login(request, user)
 	    return render(request, 'slides/index.html')
 	else:
-	    return render(request, 'slides/login.html')
+	    return HttpResponse('Not active user') 
     else:
-	return render(request, 'slides/index.html')
+	return HttpResponse('user = None')
+
+def home(request):
+    return HttpResponseRedirect(reverse('slides:index', args=[request.user.username]))

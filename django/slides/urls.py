@@ -1,11 +1,16 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
+from django.contrib.auth import views as auth_views
+from django.views.generic.base import RedirectView
 
 from . import views 
 
 app_name = 'slides'
 urlpatterns = [
-    url(r'^$', views.login, name='login'),
-#    url(r'^$', views.index, name='index'),
+#    url(r'^$', views.login, name='login_page'),
+#    url(r'^login/$', views.login_user, name='login'),
+#    url(r'^accounts/login/$', auth_views.login, {'template_name': 'slides/login.html'}),
+    url(r'^accounts/profile/$', views.home),
+    url(r'^$', views.index, name='index'),
     url(r'^index_lecturer/', views.lecturer, name='index lecturer'),
     url(r'^index_student/', views.student, name='index student'),
     url(r'^lecture/next_page/', views.next_page, name='next page'),
