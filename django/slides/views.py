@@ -62,11 +62,12 @@ def vote_current(request):
     return render(request, 'slides/index.html', {'slide': slide})
     '''
     current_slide = get_object_or_404(Slides, pk=current.page)
-    current_user = User.objects.get(username = get_username())
+    current_user = request.user
 #    current_slide.votes += 1
 #    current_slide.save()
     Votes.objects.filter(user = current_user, slide = current_slide).delete()
     v = Votes(user = current_user, slide = current_slide, value = 1)
+    v.save()
     return HttpResponseRedirect(reverse('slides:lecture', args=[0]))
 
 def login(request):
