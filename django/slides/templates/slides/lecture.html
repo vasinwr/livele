@@ -33,8 +33,8 @@
     <a href="{% url 'slides:next page' %}" class="btn btn-primary btn-lg">next</a>
     {% endif %}
     {% if student %}
-    <a href="#" class="btn btn-warning"><i class="fa fa-frown-o fa-3x" aria-hidden="true"></i></a>
-    <a href="{% url 'slides:vote' %}" class="btn btn-danger"><i class="fa fa-frown-o fa-3x" aria-hidden="true"></i></a>
+    <a href="{% url 'slides:vote up' %}" class="btn btn-success"><i class="fa fa-smile-o fa-3x" aria-hidden="true"></i></a>
+    <a href="{% url 'slides:vote down' %}" class="btn btn-danger"><i class="fa fa-frown-o fa-3x" aria-hidden="true"></i></a>
     {% endif %}
 
     <h4>Current class status</h4>
