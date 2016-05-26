@@ -38,7 +38,6 @@ def next_page(request):
 	current.page += 1
 	current.save()
     except Slides.DoesNotExist:
-	break
     return HttpResponseRedirect(reverse('slides:lecture', args=[1]))
 
 def prev_page(request):
