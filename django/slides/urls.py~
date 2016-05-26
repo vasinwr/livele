@@ -4,7 +4,8 @@ from . import views
 
 app_name = 'slides'
 urlpatterns = [
-    url(r'^$', views.index, name='index'),
+    url(r'^$', views.login, name='login'),
+#    url(r'^$', views.index, name='index'),
     url(r'^index_lecturer/', views.lecturer, name='index lecturer'),
     url(r'^index_student/', views.student, name='index student'),
     url(r'^lecture/next_page/', views.next_page, name='next page'),
