@@ -25,13 +25,20 @@ def lecture(request, isLecturer):
     return render(request, 'slides/index.html', {'slide': slide})
     '''
     current_slide = get_object_or_404(Slides, pk=current.page)
+    try:
+	myvote = Votes.objects.get(user = request.user, slide = current_slide)
+    except Votes.DoesNotExist:
+	v = Votes(user = current_user, slide = current_slide, value = 0)
+    	v.save()
+    good = Votes.objects.filter(slide = current_slide, value = 0).count()
     bad = Votes.objects.filter(slide = current_slide, value = 1).count()
+    total = (good + bad)/100
     if(isLecturer=='1'):
-        return render(request, 'slides/lecture.html', {'slide':current_slide, 'lecturer':True, 'votes_amplified':bad*5,
-                                                       'votes_rest': 100-bad*5})
+        return render(request, 'slides/lecture.html', {'slide':current_slide, 'lecturer':True, 'votes_amplified':bad / total,
+                                                       'votes_rest': good/total})
     else:
-        return render(request, 'slides/lecture.html', {'slide':current_slide, 'student':True, 'votes_amplified':bad*5,
-                                                       'votes_rest': 100-bad*5})
+        return render(request, 'slides/lecture.html', {'slide':current_slide, 'student':True, 'votes_amplified':bad/total,
+                                                       'votes_rest': good / total})
 
 def next_page(request):
     current = get_object_or_404(Current, pk=1)
