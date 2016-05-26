@@ -7,6 +7,7 @@ from . import views
 app_name = 'slides'
 urlpatterns = [
     url(r'^accounts/profile/$', views.home),
+    url(r'^logout/$', views.logout_view, name='logout'),
     url(r'^$', views.index, name='index'),
     url(r'^index_lecturer/', views.lecturer, name='index lecturer'),
     url(r'^index_student/', views.student, name='index student'),
