@@ -22,11 +22,17 @@
     <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
+
+    <script>
+       setTimeout(function(){
+           window.location.reload(1);
+       }, 5000);
+    </script>
 </head>
 
 <body id="page-top" class="index">
     <h1>Slide</h1>
-    <img src="{{ slide.img_source }}" height='350' width='500'>
+    <img src="{{ slide.img_source }}" width='70%'>
 
     {% if lecturer %}
     <a href="{% url 'slides:previous page' %}" class="btn btn-primary btn-lg">previous</a>
