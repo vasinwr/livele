@@ -21,5 +21,5 @@ urlpatterns = [
     url(r'^', include('django.contrib.auth.urls')),
     url(r'^slides/', include('slides.urls')),
     url(r'^admin/', admin.site.urls),
-    url(r'^accounts/profile/', include('slides.urls')),
+    url(r'^accounts/', include('slides.urls')),
 ]

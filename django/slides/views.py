@@ -14,12 +14,15 @@ from django.contrib.auth import logout
 def index(request):
     return render(request, 'slides/index.html') 
 
+@login_required
 def lecturer(request):
     return HttpResponseRedirect(reverse('slides:lecture', args=[1]))
 
+@login_required
 def student(request):
     return HttpResponseRedirect(reverse('slides:lecture', args=[0]))
 
+@login_required
 def lecture(request, isLecturer):
     current = get_object_or_404(Current, pk=1)
     '''
@@ -47,6 +50,7 @@ def lecture(request, isLecturer):
     else:
         return render(request, 'slides/lecture.html', {'slide':current_slide, 'student':True, 'votes_amplified':bad*100/total, 'votes_rest': good*100/ total})
 
+@login_required
 def next_page(request):
     current = get_object_or_404(Current, pk=1)
     try:
@@ -57,6 +61,7 @@ def next_page(request):
         pass
     return HttpResponseRedirect(reverse('slides:lecture', args=[1]))
 
+@login_required
 def prev_page(request):
     current = get_object_or_404(Current, pk=1)
     try:
@@ -67,6 +72,7 @@ def prev_page(request):
         pass
     return HttpResponseRedirect(reverse('slides:lecture', args=[1]))
 
+@login_required
 def vote_up(request):
     current = get_object_or_404(Current, pk=1)
     '''
@@ -87,6 +93,7 @@ def vote_up(request):
 
     return HttpResponseRedirect(reverse('slides:lecture', args=[0]))
 
+@login_required
 def vote_down(request):
     current = get_object_or_404(Current, pk=1)
     '''
@@ -105,12 +112,15 @@ def vote_down(request):
         v.save()
     return HttpResponseRedirect(reverse('slides:lecture', args=[0]))
 
+'''
+@login_required
 def home(request):
     return HttpResponseRedirect(reverse('slides:index', args=[request.user.username]))
+'''
+def login(request):
+    return HttpResponseRedirect('/login/')
 
-
+@login_required
 def logout_view(request):
-    print("HERERER")
-    
     logout(request)
     return HttpResponseRedirect('/login/')
