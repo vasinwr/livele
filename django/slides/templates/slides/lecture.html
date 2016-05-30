@@ -24,13 +24,12 @@
     <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
 
     <script>
-       socket = new WebSocket("ws://127.0.0.1:8000/all");
+       socket = new WebSocket("ws://127.0.0.1:8000/all/");
        socket.onmessage = function(message){
-         var = data = JSON.parse(message.data);
-         if(data.votes){
-           var red_width = data.votes * 5;
-           document.getElementById("red_bar").style.width = red_width + '%';
-           document.getElementById("green_bar").style.width = (100-red_width) + '%';
+         var data = JSON.parse(message.data);
+         if(data.green_bar || data.red_bar){
+           document.getElementById("red_bar").style.width = data.red_bar + '%';
+           document.getElementById("green_bar").style.width = data.green_bar + '%';
          }
        }
     </script>

@@ -1,5 +1,8 @@
+import json
 from django.db import models
 from django.contrib.auth.models import User
+from channels import Group
+from django.shortcuts import get_object_or_404
 
 # Create your models here.
 
@@ -23,3 +26,14 @@ class Votes(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     slide = models.ForeignKey(Slides, on_delete=models.CASCADE)
     value = models.IntegerField(default=0)
+
+    def send_notification(self, votes):
+        good = votes['good'] * 100 / votes['total']
+        bad = votes['bad'] * 100 / votes['total']
+        notification = {
+            "green_bar": good,
+            "red_bar": bad,
+        }
+        Group("all").send({
+            "text": json.dumps(notification),
+        })
