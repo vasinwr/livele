@@ -24,9 +24,14 @@
     <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
 <!--
     <script>
-       setTimeout(function(){
-           window.location.reload(1);
-       }, 5000);
+       socket = new WebSocket("ws://127.0.0.1:8000/all/");
+       socket.onmessage = function(message){
+         var data = JSON.parse(message.data);
+         if(data.green_bar || data.red_bar){
+           document.getElementById("red_bar").style.width = data.red_bar + '%';
+           document.getElementById("green_bar").style.width = data.green_bar + '%';
+         }
+       }
     </script>
 -->
 
@@ -55,9 +60,9 @@
 
     <h4>Current class status</h4>
     <div class="progress progress-striped active">
-        <div class="progress-bar progress-bar-danger" style="width: {{ votes_amplified }}%"></div>
+        <div id="red_bar" class="progress-bar progress-bar-danger" style="width: {{ votes_amplified }}%"></div>
         <div class="progress-bar progress-bar-warning" style="width: 0%"></div>
-        <div class="progress-bar progress-bar-success" style="width: {{ votes_rest }}%"></div>
+        <div id="green_bar" class="progress-bar progress-bar-success" style="width: {{ votes_rest }}%"></div>
     </div>
 
     <a href="/slides/" class="btn btn-danger">Main Menu</a>
