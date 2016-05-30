@@ -11,7 +11,6 @@ urlpatterns = [
     url(r'^logout/$', views.logout_view, name='logout'),
     url(r'^$', views.index, name='index'),
     url(r'^select/([a-zA-Z0-9_]+)', views.select, name='select'),
-    url(r'^upload/', views.upload, name='upload'),
     url(r'^lecture/next_page/', views.next_page, name='next page'),
     url(r'^lecture/prev_page/', views.prev_page, name='previous page'),
     url(r'^lecture/curr_page/', views.curr_page, name='current page'),

@@ -22,17 +22,23 @@
     <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
-
+<!--
     <script>
        setTimeout(function(){
            window.location.reload(1);
        }, 5000);
     </script>
+-->
+
 </head>
 
 <body id="page-top" class="index">
     <h1>Slide</h1>
+<!--
     <img src="{{ slide.img_source }}" width='70%'>
+-->
+    <div id="sample" style="height:500px; width:700px"></div>
+
 
     {% if lecturer %}
     <a href="{% url 'slides:previous page' %}" class="btn btn-primary btn-lg">previous</a>
@@ -62,6 +68,9 @@
 
     <!-- Bootstrap Core JavaScript -->
     <script src="{% static 'slides/js/bootstrap.min.js' %}"></script>
+
+    <script src="{% static 'slides/js/pdfobject.js' %}"></script>
+    <script> PDFObject.embed("{% static 'slides/js/Backpropagation.pdf' %}", "#sample");</script>
 
 
 </body>

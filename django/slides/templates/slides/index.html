@@ -26,16 +26,43 @@
 
 <body id="page-top" class="index">
     <h1>Lectures</h1>
+
     <div>
     {% for lecture in lectureList %}
 	<li><a href="/slides/select/{{lecture}}" class="btn btn-primary btn-lg">{{lecture}}</a></li>
     {% endfor %}
     </div>
 
+    <div>
     {% if lecturer %}
-    <a href="{% url 'slides:upload' %}" class="btn btn-danger">Upload</a>
-    {% endif %}
 
+        <!-- List of uploaded documents -->
+        {% if documents %}
+            <ul>
+                <li><a href="{{ documents.0.docfile.url }}">{{ documents.0.docfile.name }}</a></li>
+            </ul>
+        {% else %}
+            <p>No documents.</p>
+        {% endif %}
+
+        <!-- Upload form. Note enctype attribute! -->
+        <form action="{% url 'slides:index' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <p>{{ form.non_field_errors }}</p>
+
+            <p>{{ form.docfile.label_tag }} {{ form.docfile.help_text }}</p>
+
+            <p>
+                {{ form.docfile.errors }}
+                {{ form.docfile }}
+            </p>
+
+            <input type="submit" class="btn btn-danger" value="Upload"/>
+        </form>
+
+    {% endif %}
+    </div>
+   
     <a href="{% url 'slides:logout' %}" class="btn btn-danger">Logout</a>
 
     <!-- jQuery -->

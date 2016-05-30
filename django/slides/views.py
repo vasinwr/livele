@@ -1,21 +1,46 @@
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, render, redirect, render_to_response
+from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate, login
-from .models import Current, Slides, Votes
+from .models import Current, Slides, Votes, Pdf 
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from .forms import PdfForm
+
 
 # Create your views here.
 
 @login_required
 def index(request):
-    if(request.user.groups.filter(name = 'Lecturer').count() == 1):
-	return render(request, 'slides/index.html', {'lecturer':True, 'lectureList': Slides.objects.values_list('slide_text', flat=True).distinct()})
+    # Handle file upload
+    if request.method == 'POST':
+        form = PdfForm(request.POST, request.FILES)
+        if form.is_valid():
+            newdoc = Pdf(docfile=request.FILES['docfile'])
+            newdoc.save()
+
+            # Redirect to the document list after POST
+            return HttpResponseRedirect(reverse('slides:index'))
     else:
-	return render(request, 'slides/index.html', {'lectureList': Slides.objects.values_list('slide_text', flat=True).distinct()})
+        form = PdfForm()  # A empty, unbound form
+
+    # Load documents for the list page
+    documents = Pdf.objects.all()
+    '''
+    return render_to_response(
+        'slides/index.html',
+        {'documents': documents, 'form': form},
+        context_instance=RequestContext(request)
+    )
+    '''
+    # Render list page with the documents and the form
+    if(request.user.groups.filter(name = 'Lecturer').count() == 1):
+	return render(request, 'slides/index.html', {'lecturer':True, 'lectureList': Slides.objects.values_list('slide_text', flat=True).distinct(), 'documents': documents, 'form': form})
+    else:
+	return render(request, 'slides/index.html', {'lectureList': Slides.objects.values_list('slide_text', flat=True).distinct(), 'documents': documents, 'form': form})
 
 @login_required
 def select(request, name):
@@ -166,3 +191,27 @@ def login(request):
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect('/login/')
+
+@login_required
+def upload(request):
+    # Handle file upload
+    if request.method == 'POST':
+        form = PdfForm(request.POST, request.FILES)
+        if form.is_valid():
+            newdoc = Pdf(docfile=request.FILES['docfile'])
+            newdoc.save()
+
+            # Redirect to the document list after POST
+            return HttpResponseRedirect(reverse('slides:upload'))
+    else:
+        form = PdfForm()  # A empty, unbound form
+
+    # Load documents for the list page
+    documents = Pdf.objects.all()
+
+    # Render list page with the documents and the form
+    return render_to_response(
+        'upload.html',
+        {'documents': documents, 'form': form},
+        context_instance=RequestContext(request)
+    )
