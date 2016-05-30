@@ -38,9 +38,9 @@ def index(request):
     '''
     # Render list page with the documents and the form
     if(request.user.groups.filter(name = 'Lecturer').count() == 1):
-	return render(request, 'slides/index.html', {'lecturer':True, 'lectureList': Slides.objects.values_list('slide_text', flat=True).distinct(), 'documents': documents, 'form': form})
+        return render(request, 'slides/index.html', {'lecturer':True, 'lectureList': Slides.objects.values_list('slide_text', flat=True).distinct(), 'documents': documents, 'form': form})
     else:
-	return render(request, 'slides/index.html', {'lectureList': Slides.objects.values_list('slide_text', flat=True).distinct(), 'documents': documents, 'form': form})
+        return render(request, 'slides/index.html', {'lectureList': Slides.objects.values_list('slide_text', flat=True).distinct(), 'documents': documents, 'form': form})
 
 @login_required
 def select(request, name):
