@@ -26,15 +26,10 @@
 
 <body id="page-top" class="index">
     <h1>Lectures</h1>
-    <div>
-    {% for lecture in lectureList %}
-	<li><a href="/slides/select/{{lecture}}" class="btn btn-primary btn-lg">{{lecture}}</a></li>
-    {% endfor %}
-    </div>
 
-    {% if lecturer %}
-    <a href="{% url 'slides:upload' %}" class="btn btn-danger">Upload</a>
-    {% endif %}
+    {% for lecture in lectureList %}
+	<a href="{% url 'slides:select/abc' %}" class="btn btn-primary btn-lg">{{lecture}}</a>
+    {% endfor %}
 
     <a href="{% url 'slides:logout' %}" class="btn btn-danger">Logout</a>
 

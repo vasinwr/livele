@@ -7,6 +7,7 @@ class Current(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, default = 1)
     slide_name = models.CharField(max_length=200)
     page = models.IntegerField()
+    active = models.IntegerField(default = 0)
 
 
 class Slides(models.Model):

@@ -12,24 +12,39 @@ from django.contrib.auth import logout
 
 @login_required
 def index(request):
+    if(request.user.groups.filter(name = 'Lecturer').count() == 1):
+	return render(request, 'slides/index.html', {'lecturer':True, 'lectureList': Slides.objects.values_list('slide_text', flat=True).distinct()})
+    else:
+	return render(request, 'slides/index.html', {'lectureList': Slides.objects.values_list('slide_text', flat=True).distinct()})
+
+@login_required
+def select(request, name):
+#deactive all other actives.
     try:
-	current = Current.objects.get(owner = request.user)
+	other = Current.objects.get(owner = request.user, active=1)
+	other.active = 0
+	other.save()
     except Current.DoesNotExist:
-	current = Current(owner = request.user, slide_name = 'first', page = 1)
+	pass
+
+    try:
+	current = Current.objects.get(owner = request.user, slide_name = name)
+	current.active = 1
 	current.save()
+    except Current.DoesNotExist:
+	current = Current(owner = request.user, slide_name = name, page=1, active=1)
+	current.save()
+
     return HttpResponseRedirect(reverse('slides:lecture'))
 
 @login_required
-def lecturer(request):
-    return HttpResponseRedirect(reverse('slides:lecture', args=[1]))
-
-@login_required
-def student(request):
-    return HttpResponseRedirect(reverse('slides:lecture', args=[0]))
+def upload(request):
+# create lecturer's current at page 1 immediately after upload.
+    pass
 
 @login_required
 def lecture(request):
-    current = get_object_or_404(Current, owner = request.user)
+    current = get_object_or_404(Current, owner = request.user, active=1)
     '''
     qs = Slides.objects.filter(slide_text=current.slide_name)
     qs = qs.filter(page = current.page)
@@ -61,9 +76,9 @@ def lecture(request):
 
 @login_required
 def next_page(request):
-    current = get_object_or_404(Current, owner = request.user)
+    current = get_object_or_404(Current, owner = request.user, active=1)
     try:
-        slide = Slides.objects.get(page = current.page + 1)
+        slide = Slides.objects.get(slide_text = current.slide_name, page = current.page + 1)
         current.page += 1
         current.save()
     except Slides.DoesNotExist:
@@ -72,9 +87,9 @@ def next_page(request):
 
 @login_required
 def prev_page(request):
-    current = get_object_or_404(Current, owner = request.user)
+    current = get_object_or_404(Current, owner = request.user, active=1)
     try:
-        slide = Slides.objects.get(page = current.page - 1)
+        slide = Slides.objects.get(slide_text = current.slide_name, page = current.page - 1)
         current.page -= 1
         current.save()
     except Slides.DoesNotExist:
@@ -83,7 +98,7 @@ def prev_page(request):
 
 @login_required
 def curr_page(request):
-    mycurr = get_object_or_404(Current, owner = request.user)
+    mycurr = get_object_or_404(Current, owner = request.user, active=1)
     lecturer = Slides.objects.get(slide_text = mycurr.slide_name, page=1).lecturer
     try:
 	lecture_curr = Current.objects.get(slide_name = mycurr.slide_name, owner = lecturer)
@@ -95,7 +110,7 @@ def curr_page(request):
 
 @login_required
 def vote_up(request):
-    current = get_object_or_404(Current, owner = request.user)
+    current = get_object_or_404(Current, owner = request.user, active=1)
     '''
     qs = Slides.objects.filter(slide_text=current.slide_name)
     qs = qs.filter(page = current.page)
@@ -118,7 +133,7 @@ def vote_up(request):
 
 @login_required
 def vote_down(request):
-    current = get_object_or_404(Current, owner = request.user)
+    current = get_object_or_404(Current, owner = request.user, active=1)
     '''
     qs = Slides.objects.filter(slide_text=current.slide_name)
     qs = qs.filter(page = current.page)
