@@ -121,3 +121,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+
+#for channels -nonblocking layer (websocket support etc)
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgiref.inmemory.ChannelLayer",
+        "ROUTING": "slides.routing.channel_routing",
+    }
+}
+
