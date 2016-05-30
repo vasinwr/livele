@@ -14,8 +14,9 @@ urlpatterns = [
     url(r'^index_student/', views.student, name='index student'),
     url(r'^lecture/next_page/', views.next_page, name='next page'),
     url(r'^lecture/prev_page/', views.prev_page, name='previous page'),
+    url(r'^lecture/curr_page/', views.curr_page, name='current page'),
     url(r'^lecture/vote_up/', views.vote_up, name='vote up'),
     url(r'^lecture/vote_down/', views.vote_down, name='vote down'),
     #lecture/ must be at the bottom otherwise it will always be matched first
-    url(r'^lecture/(?P<isLecturer>[0-1])', views.lecture, name='lecture'),
+    url(r'^lecture/', views.lecture, name='lecture'),
 ]

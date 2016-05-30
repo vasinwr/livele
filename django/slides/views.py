@@ -12,7 +12,12 @@ from django.contrib.auth import logout
 
 @login_required
 def index(request):
-    return render(request, 'slides/index.html') 
+    try:
+	current = Current.objects.get(owner = request.user)
+    except Current.DoesNotExist:
+	current = Current(owner = request.user, slide_name = 'first', page = 1)
+	current.save()
+    return HttpResponseRedirect(reverse('slides:lecture'))
 
 @login_required
 def lecturer(request):
@@ -23,16 +28,20 @@ def student(request):
     return HttpResponseRedirect(reverse('slides:lecture', args=[0]))
 
 @login_required
-def lecture(request, isLecturer):
-    current = get_object_or_404(Current, pk=1)
+def lecture(request):
+    current = get_object_or_404(Current, owner = request.user)
     '''
     qs = Slides.objects.filter(slide_text=current.slide_name)
     qs = qs.filter(page = current.page)
     slide = qs.reverse()[:1]
     return render(request, 'slides/index.html', {'slide': slide})
     '''
-    current_slide = get_object_or_404(Slides, pk=current.page)
-    if(isLecturer=='0'):
+    try:
+	current_slide = Slides.objects.get(slide_text = current.slide_name, page= current.page)
+    except Slides.DoesNotExist:
+	return HttpResponseNotFound()
+    canVote = Current.objects.get(owner = current_slide.lecturer, slide_name = current_slide.slide_text).page >= current.page
+    if(canVote and request.user.groups.filter(name = 'Student').count() == 1):
         try:
             myvote = Votes.objects.get(user = request.user, slide = current_slide)
         except Votes.DoesNotExist:
@@ -42,75 +51,93 @@ def lecture(request, isLecturer):
     good = Votes.objects.filter(slide = current_slide, value = 0).count()
     bad = Votes.objects.filter(slide = current_slide, value = 1).count()
     total = good + bad
-    if(isLecturer=='1'):
-        if (total == 0):
-            total = 1
-            good = 1
+    if (total == 0):
+	total = 1
+	good = 1
+    if(request.user.groups.filter(name = 'Lecturer').count() == 1):
         return render(request, 'slides/lecture.html', {'slide':current_slide, 'lecturer':True, 'votes_amplified':bad *100 / total, 'votes_rest': good*100/total})
     else:
         return render(request, 'slides/lecture.html', {'slide':current_slide, 'student':True, 'votes_amplified':bad*100/total, 'votes_rest': good*100/ total})
 
 @login_required
 def next_page(request):
-    current = get_object_or_404(Current, pk=1)
+    current = get_object_or_404(Current, owner = request.user)
     try:
         slide = Slides.objects.get(page = current.page + 1)
         current.page += 1
         current.save()
     except Slides.DoesNotExist:
         pass
-    return HttpResponseRedirect(reverse('slides:lecture', args=[1]))
+    return HttpResponseRedirect(reverse('slides:lecture'))
 
 @login_required
 def prev_page(request):
-    current = get_object_or_404(Current, pk=1)
+    current = get_object_or_404(Current, owner = request.user)
     try:
         slide = Slides.objects.get(page = current.page - 1)
         current.page -= 1
         current.save()
     except Slides.DoesNotExist:
         pass
-    return HttpResponseRedirect(reverse('slides:lecture', args=[1]))
+    return HttpResponseRedirect(reverse('slides:lecture'))
+
+@login_required
+def curr_page(request):
+    mycurr = get_object_or_404(Current, owner = request.user)
+    lecturer = Slides.objects.get(slide_text = mycurr.slide_name, page=1).lecturer
+    try:
+	lecture_curr = Current.objects.get(slide_name = mycurr.slide_name, owner = lecturer)
+	mycurr.page = lecture_curr.page
+	mycurr.save()
+    except Slides.DoesNotExist:
+        return HttpResponseNotFound()
+    return HttpResponseRedirect(reverse('slides:lecture'))
 
 @login_required
 def vote_up(request):
-    current = get_object_or_404(Current, pk=1)
+    current = get_object_or_404(Current, owner = request.user)
     '''
     qs = Slides.objects.filter(slide_text=current.slide_name)
     qs = qs.filter(page = current.page)
     slide = qs.reverse()[:1]
     return render(request, 'slides/index.html', {'slide': slide})
     '''
-    current_slide = get_object_or_404(Slides, pk=current.page)
+    current_slide = Slides.objects.get(slide_text = current.slide_name, page= current.page)
 
-    try:
-        v = Votes.objects.get(user = request.user, slide = current_slide)
-        v.value = 0
-        v.save()
-    except Votes.DoesNotExist:
-        v = Votes(user = request.user, slide = current_slide, value = 0)
-        v.save()
-
-    return HttpResponseRedirect(reverse('slides:lecture', args=[0]))
+    if (Current.objects.get(owner = current_slide.lecturer, slide_name = current_slide.slide_text).page >= current.page):
+	try:
+	    v = Votes.objects.get(user = request.user, slide = current_slide)
+	    v.value = 0
+	    v.save()
+	except Votes.DoesNotExist:
+	    v = Votes(user = request.user, slide = current_slide, value = 0)
+	    v.save()
+    else:
+	pass
+    return HttpResponseRedirect(reverse('slides:lecture'))
 
 @login_required
 def vote_down(request):
-    current = get_object_or_404(Current, pk=1)
+    current = get_object_or_404(Current, owner = request.user)
     '''
     qs = Slides.objects.filter(slide_text=current.slide_name)
     qs = qs.filter(page = current.page)
     slide = qs.reverse()[:1]
     return render(request, 'slides/index.html', {'slide': slide})
     '''
-    current_slide = get_object_or_404(Slides, pk=current.page)
-    try:
-        v = Votes.objects.get(user = request.user, slide = current_slide)
-        v.value = 1
-        v.save()
-    except Votes.DoesNotExist:
-        v = Votes(user = request.user, slide = current_slide, value = 1)
-        v.save()
-    return HttpResponseRedirect(reverse('slides:lecture', args=[0]))
+    current_slide = Slides.objects.get(slide_text = current.slide_name, page= current.page)
+
+    if (Current.objects.get(owner = current_slide.lecturer, slide_name = current_slide.slide_text).page >= current.page):
+	try:
+	    v = Votes.objects.get(user = request.user, slide = current_slide)
+	    v.value = 1
+	    v.save()
+	except Votes.DoesNotExist:
+	    v = Votes(user = request.user, slide = current_slide, value = 1)
+	    v.save()
+    else:
+	pass
+    return HttpResponseRedirect(reverse('slides:lecture'))
 
 '''
 @login_required
