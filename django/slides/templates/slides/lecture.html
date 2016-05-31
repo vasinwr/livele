@@ -33,20 +33,41 @@
        }
     </script>
 
+    <script>
+        var pageCount = 135;
+        function increment() {
+            if (pageCount == maxPages)
+                return;
+            pageCount++;
+            getPdf();
+        }
+        function decrement() {
+            if (pageCount == 1)
+                return;
+            pageCount--;
+            getPdf();
+        }
+    </script>
+
 </head>
 
 <body id="page-top" class="index">
     <h1>Slide</h1>
 <!--
     <img src="{{ slide.img_source }}" width='70%'>
--->
 
     <div id="sample" style="height:500px; width:700px"></div>
-
+-->
+    <canvas id="the-canvas" style="border:1px solid black"></canvas>
 
     {% if lecturer %}
+<!--
     <a href="{% url 'slides:previous page' %}" class="btn btn-primary btn-lg">previous</a>
     <a href="{% url 'slides:next page' %}" class="btn btn-primary btn-lg">next</a>
+-->
+    <input type="button" onclick="decrement()" class="btn btn-primary btn-lg" value="Prev"/>
+    <input type="button" onclick="increment()" class="btn btn-primary btn-lg" value="Next"/>
+
     {% endif %}
     {% if student %}
     <a href="{% url 'slides:previous page' %}" class="btn btn-primary btn-lg">previous</a>
@@ -73,8 +94,42 @@
     <!-- Bootstrap Core JavaScript -->
     <script src="{% static 'slides/js/bootstrap.min.js' %}"></script>
 
+<!--
     <script src="{% static 'slides/js/pdfobject.js' %}"></script>
     <script> PDFObject.embed("../../media/uploads/current.pdf", "#sample");</script>
+-->
+
+    <script src="{% static 'slides/js/pdf.js' %}"></script>
+
+    <script id="script">  
+      var url ="../../media/uploads/current.pdf";
+      var maxPages = 0;
+      PDFJS.workerSrc = "{% static 'slides/js/pdf.worker.js' %}";
+      function getPdf() {
+      PDFJS.getDocument(url).then(function getPdfHelloWorld(pdf) {
+        // Fetch the first page
+        maxPages = pdf.numPages;
+        pdf.getPage(pageCount).then(function getPageHelloWorld(page) {
+          var scale = 1.5;
+          var viewport = page.getViewport(scale);
+          // Prepare canvas using PDF page dimensions
+          var canvas = document.getElementById('the-canvas');
+          var context = canvas.getContext('2d');
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+          // Render PDF page into canvas context
+          var renderContext = {
+            canvasContext: context,
+            viewport: viewport
+          };
+          page.render(renderContext);
+        });
+      });
+      };
+      getPdf();
+    </script>
+
+
 
 
 </body>
