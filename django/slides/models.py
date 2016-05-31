@@ -48,14 +48,5 @@ def rename(instance, filename):
     return os.path.join('uploads', filename)
 
 class Pdf(models.Model):
-    docfile = models.FileField(upload_to=rename)
+    pdffile = models.FileField(upload_to=rename)
 
-    def save(self, *args, **kwargs):
-        # delete old file when replacing by updating the file
-        try:
-            this = Pdf.objects.get(id=self.id)
-            if this.image != self.docfile:
-                this.docfile.delete(save=False)
-        except: pass # when new photo then we do nothing, normal case          
-        super(Pdf, self).save(*args, **kwargs)
- 

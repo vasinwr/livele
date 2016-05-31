@@ -19,7 +19,7 @@ def index(request):
     if request.method == 'POST':
         form = PdfForm(request.POST, request.FILES)
         if form.is_valid():
-            newdoc = Pdf(docfile=request.FILES['docfile'])
+            newdoc = Pdf(pdffile=request.FILES['pdffile'])
             newdoc.save()
 
             # Redirect to the document list after POST

@@ -39,7 +39,7 @@
         <!-- List of uploaded documents -->
         {% if documents %}
             <ul>
-                <li><a href="{{ documents.0.docfile.url }}">{{ documents.0.docfile.name }}</a></li>
+                <li><a href="{{ documents.0.pdffile.url }}">{{ documents.0.pdffile.name }}</a></li>
             </ul>
         {% else %}
             <p>No documents.</p>
@@ -50,11 +50,11 @@
             {% csrf_token %}
             <p>{{ form.non_field_errors }}</p>
 
-            <p>{{ form.docfile.label_tag }} {{ form.docfile.help_text }}</p>
+            <p>{{ form.pdffile.label_tag }} {{ form.pdffile.help_text }}</p>
 
             <p>
-                {{ form.docfile.errors }}
-                {{ form.docfile }}
+                {{ form.pdffile.errors }}
+                {{ form.pdffile }}
             </p>
 
             <input type="submit" class="btn btn-danger" value="Upload"/>

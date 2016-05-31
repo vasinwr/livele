@@ -58,7 +58,7 @@
 
     <div id="sample" style="height:500px; width:700px"></div>
 -->
-    <canvas id="the-canvas" style="border:1px solid black; height:500px; width:700px"></canvas>
+    <canvas id="pdfviewer" style="border:1px solid black; height:500px; width:700px"></canvas>
 
     {% if lecturer %}
 <!--
@@ -111,7 +111,7 @@
             var scale = 1.5;
             var viewport = page.getViewport(scale);
             // Prepare canvas using PDF page dimensions
-            var canvas = document.getElementById('the-canvas');
+            var canvas = document.getElementById('pdfviewer');
             var context = canvas.getContext('2d');
             canvas.height = viewport.height;
             canvas.width = viewport.width;
