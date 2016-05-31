@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from channels import Group
 from django.shortcuts import get_object_or_404
-
+import os
 
 # Create your models here.
 
@@ -39,5 +39,23 @@ class Votes(models.Model):
             "text": json.dumps(notification),
         })
 
+def rename(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = "current.%s" % (ext)
+    directory = os.path.join('media/uploads', filename)
+    if os.path.isfile(directory):
+        os.remove(directory)
+    return os.path.join('uploads', filename)
+
 class Pdf(models.Model):
-    docfile = models.FileField(upload_to='documents/%Y/%m/%d')
+    docfile = models.FileField(upload_to=rename)
+
+    def save(self, *args, **kwargs):
+        # delete old file when replacing by updating the file
+        try:
+            this = Pdf.objects.get(id=self.id)
+            if this.image != self.docfile:
+                this.docfile.delete(save=False)
+        except: pass # when new photo then we do nothing, normal case          
+        super(Pdf, self).save(*args, **kwargs)
+ 

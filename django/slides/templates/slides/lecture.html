@@ -40,6 +40,7 @@
 <!--
     <img src="{{ slide.img_source }}" width='70%'>
 -->
+
     <div id="sample" style="height:500px; width:700px"></div>
 
 
@@ -73,7 +74,7 @@
     <script src="{% static 'slides/js/bootstrap.min.js' %}"></script>
 
     <script src="{% static 'slides/js/pdfobject.js' %}"></script>
-    <script> PDFObject.embed("{% static 'slides/js/Backpropagation.pdf' %}", "#sample");</script>
+    <script> PDFObject.embed("../../media/uploads/current.pdf", "#sample");</script>
 
 
 </body>
