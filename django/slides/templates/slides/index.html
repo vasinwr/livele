@@ -71,6 +71,35 @@
     <!-- Bootstrap Core JavaScript -->
     <script src="{% static 'slides/js/bootstrap.min.js' %}"></script>
 
+    <script>
+        function addLecture() {
+            var div = document.createElement('div');
+            div.className = 'lecture';
+             
+            div.innerHTML = '
+        {% if documents %}
+            <ul>
+                <li><a href="{{ documents.0.pdffile.url }}">{{ documents.0.pdffile.name }}</a></li>
+            </ul>
+        {% else %}
+            <p>No documents.</p>
+        {% endif %}
+
+        <!-- Upload form. Note enctype attribute! -->
+        <form action="{% url 'slides:index' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <p>{{ form.non_field_errors }}</p>
+
+            <p>{{ form.pdffile.label_tag }} {{ form.pdffile.help_text }}</p>
+
+            <p>
+                {{ form.pdffile.errors }}
+                {{ form.pdffile }}
+            </p>
+
+            <input type="submit" class="btn btn-danger" value="Upload"/>
+        </form>'
+        }
 
 </body>
 
