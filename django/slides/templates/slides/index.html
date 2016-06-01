@@ -26,24 +26,19 @@
 
 <body id="page-top" class="index">
     <h1>Lectures</h1>
-
     <div>
-    {% for lecture in lectureList %}
-	<li><a href="/slides/select/{{lecture}}" class="btn btn-primary btn-lg">{{lecture}}</a></li>
-    {% endfor %}
+    <!-- List of uploaded documents -->
+    {% if documents %}
+        <ul>
+            <li><a href="{{ documents.0.pdffile.url }}">{{ documents.0.pdffile.name }}</a></li>
+        </ul>
+    {% else %}
+        <p>No documents.</p>
+    {% endif %}
     </div>
 
     <div>
     {% if lecturer %}
-
-        <!-- List of uploaded documents -->
-        {% if documents %}
-            <ul>
-                <li><a href="{{ documents.0.pdffile.url }}">{{ documents.0.pdffile.name }}</a></li>
-            </ul>
-        {% else %}
-            <p>No documents.</p>
-        {% endif %}
 
         <!-- Upload form. Note enctype attribute! -->
         <form action="{% url 'slides:index' %}" method="post" enctype="multipart/form-data">

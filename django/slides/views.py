@@ -3,7 +3,7 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate, login
-from .models import Current, Slides, Votes, Pdf 
+from .models import Current, PDF, Votes 
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -19,16 +19,18 @@ def index(request):
     if request.method == 'POST':
         form = PdfForm(request.POST, request.FILES)
         if form.is_valid():
-            newdoc = Pdf(pdffile=request.FILES['pdffile'])
-            newdoc.save()
+# felix please fix
+#            newdoc = PDF(pdffile=request.FILES['pdffile'])
+#            newdoc.save()
 
             # Redirect to the document list after POST
             return HttpResponseRedirect(reverse('slides:index'))
     else:
         form = PdfForm()  # A empty, unbound form
 
-    # Load documents for the list page
-    documents = Pdf.objects.all()
+    # Load documents for the list page 
+    # for now, all is ok, we will change to filter (course ) later
+    documents = PDF.objects.all()
     '''
     return render_to_response(
         'slides/index.html',
@@ -38,9 +40,9 @@ def index(request):
     '''
     # Render list page with the documents and the form
     if(request.user.groups.filter(name = 'Lecturer').count() == 1):
-        return render(request, 'slides/index.html', {'lecturer':True, 'lectureList': Slides.objects.values_list('slide_text', flat=True).distinct(), 'documents': documents, 'form': form})
+        return render(request, 'slides/index.html', {'lecturer':True, 'documents': documents, 'form': form})
     else:
-        return render(request, 'slides/index.html', {'lectureList': Slides.objects.values_list('slide_text', flat=True).distinct(), 'documents': documents, 'form': form})
+        return render(request, 'slides/index.html', {'documents': documents, 'form': form})
 
 @login_required
 def select(request, name):
@@ -53,55 +55,45 @@ def select(request, name):
         pass
 
     try:
-        current = Current.objects.get(owner = request.user, slide_name = name)
+	curr_pdf = PDF.objects.get(filename = name)
+        current = Current.objects.get(owner = request.user, pdf = curr_pdf)
         current.active = 1
         current.save()
     except Current.DoesNotExist:
-        current = Current(owner = request.user, slide_name = name, page=1, active=1)
+        current = Current(owner = request.user, pdf = curr_pdf, page=1, active=1)
         current.save()
 
     return HttpResponseRedirect(reverse('slides:lecture'))
 
 @login_required
-def upload(request):
-# create lecturer's current at page 1 immediately after upload.
-    pass
-
-@login_required
 def lecture(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
-    try:
-        current_slide = Slides.objects.get(slide_text = current.slide_name, page= current.page)
-    except Slides.DoesNotExist:
-        return HttpResponseNotFound()
+    pdf = current.pdf
 
     votes = get_votes(request);
     good = votes['good']
     bad = votes['bad']
     total = votes['total']
     if(request.user.groups.filter(name = 'Lecturer').count() == 1):
-        return render(request, 'slides/lecture.html', {'slide':current_slide, 'lecturer':True, 'votes_amplified':bad *100 / total, 'votes_rest': good*100/total})
+#felix pass in arguments here
+        return render(request, 'slides/lecture.html', {'filename': pdf.filename, 'course':pdf.course, 'pageCount':current.page, 'lecturer':True, 'votes_amplified':bad *100 / total, 'votes_rest': good*100/total})
     else:
-        return render(request, 'slides/lecture.html', {'slide':current_slide, 'student':True, 'votes_amplified':bad*100/total, 'votes_rest': good*100/ total})
+        return render(request, 'slides/lecture.html', {'filename': pdf.filename, 'course':pdf.course, 'pageCount':current.page, 'student':True, 'votes_amplified':bad*100/total, 'votes_rest': good*100/ total})
 
 def get_votes(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
+    curr_pdf = current.pdf
 
-    try:
-        current_slide = Slides.objects.get(slide_text = current.slide_name, page= current.page)
-    except Slides.DoesNotExist:
-        return HttpResponseNotFound()
-
-    canVote = Current.objects.get(owner = current_slide.lecturer, slide_name = current_slide.slide_text).page >= current.page
+    canVote = curr_pdf.current_page >= current.page
     if(canVote and request.user.groups.filter(name = 'Student').count() == 1):
         try:
-            myvote = Votes.objects.get(user = request.user, slide = current_slide)
+            myvote = Votes.objects.get(user = request.user, pdf = curr_pdf, page = current.page)
         except Votes.DoesNotExist:
-            v = Votes(user = request.user, slide = current_slide, value = 0)
+            v = Votes(user = request.user, pdf = curr_pdf, page = current.page, value = 0)
             v.save()
 
-    good = Votes.objects.filter(slide = current_slide, value = 0).count()
-    bad = Votes.objects.filter(slide = current_slide, value = 1).count()
+    good = Votes.objects.filter(pdf = curr_pdf, page = current.page, value = 0).count()
+    bad = Votes.objects.filter(pdf = curr_pdf, page = current.page, value = 1).count()
     total = good + bad
     if (total == 0):
         total = 1
@@ -113,48 +105,40 @@ def get_votes(request):
 @login_required
 def next_page(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
-    try:
-        slide = Slides.objects.get(slide_text = current.slide_name, page = current.page + 1)
-        current.page += 1
-        current.save()
-    except Slides.DoesNotExist:
-        pass
+# felix is there a check in pdf to check if page > last page?
+#    if (current.page +1 <= current.pdf.**lastpage**)
+#	current.page +=1
+#	current.save()
+#	if(request.user.groups.filter(name = 'Lecturer').count() == 1):
+#	    current.pdf.current_page += 1
     return HttpResponseRedirect(reverse('slides:lecture'))
 
 @login_required
 def prev_page(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
-    try:
-        slide = Slides.objects.get(slide_text = current.slide_name, page = current.page - 1)
-        current.page -= 1
-        current.save()
-    except Slides.DoesNotExist:
-        pass
+    if (current.page > 1):
+	current.page -= 1
+	current.save
+	if(request.user.groups.filter(name = 'Lecturer').count() == 1):
+	    current.pdf.current_page -= 1
     return HttpResponseRedirect(reverse('slides:lecture'))
 
 @login_required
 def curr_page(request):
     mycurr = get_object_or_404(Current, owner = request.user, active=1)
-    lecturer = Slides.objects.get(slide_text = mycurr.slide_name, page=1).lecturer
-    try:
-        lecture_curr = Current.objects.get(slide_name = mycurr.slide_name, owner = lecturer)
-        mycurr.page = lecture_curr.page
-        mycurr.save()
-    except Slides.DoesNotExist:
-        return HttpResponseNotFound()
+    mycurr.page = mycurr.pdf.current_page
     return HttpResponseRedirect(reverse('slides:lecture'))
 
 @login_required
 def vote_up(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
-    current_slide = Slides.objects.get(slide_text = current.slide_name, page= current.page)
 
-    if (Current.objects.get(owner = current_slide.lecturer, slide_name = current_slide.slide_text).page >= current.page):
+    if (current.pdf.current_page >= current.page):
         try:
-            v = Votes.objects.get(user = request.user, slide = current_slide)
+            v = Votes.objects.get(user = request.user, pdf = current.pdf, page = current.page)
             v.value = 0
         except Votes.DoesNotExist:
-            v = Votes(user = request.user, slide = current_slide, value = 0)
+            v = Votes(user = request.user, pdf = current.pdf, page = current.page, value = 0)
         v.save()
         v.send_notification(get_votes(request))
     else:
@@ -164,14 +148,13 @@ def vote_up(request):
 @login_required
 def vote_down(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
-    current_slide = Slides.objects.get(slide_text = current.slide_name, page= current.page)
 
-    if (Current.objects.get(owner = current_slide.lecturer, slide_name = current_slide.slide_text).page >= current.page):
+    if (current.pdf.current_page >= current.page):
         try:
-            v = Votes.objects.get(user = request.user, slide = current_slide)
+            v = Votes.objects.get(user = request.user, pdf = current.pdf, page = current.page)
             v.value = 1
         except Votes.DoesNotExist:
-            v = Votes(user = request.user, slide = current_slide, value = 1)
+            v = Votes(user = request.user, pdf = current.pdf, page = current.page, value = 1)
         v.save()
         v.send_notification(get_votes(request))
     else:

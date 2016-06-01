@@ -32,7 +32,7 @@
          }
        }
     </script>
-
+<!--
     <script>
         var pageCount = 1;
         function increment() {
@@ -49,6 +49,8 @@
         }
     </script>
 
+-->
+
 </head>
 
 <body id="page-top" class="index">
@@ -61,13 +63,13 @@
     <canvas id="pdfviewer" style="border:1px solid black; height:500px; width:700px"></canvas>
 
     {% if lecturer %}
-<!--
+
     <a href="{% url 'slides:previous page' %}" class="btn btn-primary btn-lg">previous</a>
     <a href="{% url 'slides:next page' %}" class="btn btn-primary btn-lg">next</a>
--->
+<!--
     <input type="button" onclick="decrement()" class="btn btn-primary btn-lg" value="Prev"/>
     <input type="button" onclick="increment()" class="btn btn-primary btn-lg" value="Next"/>
-
+-->
     {% endif %}
     {% if student %}
     <a href="{% url 'slides:previous page' %}" class="btn btn-primary btn-lg">previous</a>
