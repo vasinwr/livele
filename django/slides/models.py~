@@ -9,7 +9,7 @@ from django.forms import ModelForm
 # Create your models here.
 
 def rename(instance, filename):
-    return '/'.join([instance.course.name, filename])
+    return '/'.join([filename])
 
 class PDF(models.Model):
     filename = models.CharField(max_length=200)
@@ -27,7 +27,7 @@ class PDF(models.Model):
             this = PDF.objects.get(id=self.id)
             if this.pdffile != self.pdffile:
                 this.pdffile.delete(save=False)
-        except: pass # when new photo then we do nothing, normal case          
+        except: pass           
         super(PDF, self).save(*args, **kwargs)
 
 class PDFForm(ModelForm):
@@ -42,7 +42,7 @@ class Current(models.Model):
     active = models.IntegerField(default = 0)
 
     def __str__(self):
-        return self.owner +' '+ str(self.pdf) +' '+ str(self.page)  + ('active' if (self.active == 1) else 'inactive')
+        return str(self.owner) +' '+ str(self.pdf) +' page'+ str(self.page)  + (' active' if (self.active == 1) else ' inactive')
 
 class Votes(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -51,7 +51,7 @@ class Votes(models.Model):
     value = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.user +' '+ str(self.pdf) +' '+ str(self.page)  + ('happy' if (self.value == 0) else 'unhappy')
+        return str(self.user) +' '+ str(self.pdf) +' page'+ str(self.page)  + (' happy' if (self.value == 0) else ' unhappy')
 
     def send_notification(self, votes):
         good = votes['good'] * 100 / votes['total']
@@ -69,11 +69,16 @@ class Question(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     pdf = models.ForeignKey(PDF, on_delete=models.CASCADE)
     page = models.IntegerField()
-    text = models.CharField(max_length=200)
+    text = models.TextField()
 
     def __str__(self):
-        return self.user +' '+ str(self.pdf) +' '+ str(self.page)  + self.text
+        return str(self.user) +' '+ str(self.pdf) +' page'+ str(self.page)+' '  + self.text
 
-class Question_Vote(models.Model)
+class Question_Vote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
+
+class QuestionForm(ModelForm):
+    class Meta:
+	model = Question
+	fields = ['text']

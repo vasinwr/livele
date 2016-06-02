@@ -44,7 +44,7 @@
     {% if lecturer %}
 
         <!-- Upload form. Note enctype attribute! -->
-        <form action="{% url 'slides:index' %}" method="post" enctype="multipart/form-data">
+        <form action="{% url 'slides:course_index' course %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div id="Input">
             <p> Lecture: {{ form.filename }} </p>

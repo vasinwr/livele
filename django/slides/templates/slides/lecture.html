@@ -32,24 +32,6 @@
          }
        }
     </script>
-<!--
-    <script>
-        var pageCount = 1;
-        function increment() {
-            if (pageCount == maxPages)
-                return;
-            pageCount++;
-            getPdf();
-        }
-        function decrement() {
-            if (pageCount == 1)
-                return;
-            pageCount--;
-            getPdf();
-        }
-    </script>
-
--->
 
 </head>
 
@@ -63,23 +45,20 @@
     <canvas id="pdfviewer" style="border:1px solid black; height:500px; width:700px"></canvas>
 
     {% if lecturer %}
+    <a href="{% url 'slides:previous page' %}" id="prev" class="btn btn-primary btn-lg">Previous</a>
+    <a href="{% url 'slides:next page' %}" id="next" class="btn btn-primary btn-lg">Next</a>
 
-    <a href="{% url 'slides:previous page' %}" class="btn btn-primary btn-lg">previous</a>
-    <a href="{% url 'slides:next page' %}" class="btn btn-primary btn-lg">next</a>
-<!--
-    <input type="button" onclick="decrement()" class="btn btn-primary btn-lg" value="Prev"/>
-    <input type="button" onclick="increment()" class="btn btn-primary btn-lg" value="Next"/>
--->
     {% endif %}
     {% if student %}
     <a href="{% url 'slides:previous page' %}" class="btn btn-primary btn-lg">previous</a>
-    <a href="{% url 'slides:next page' %}" class="btn btn-primary btn-lg">next</a>
+    <a href="{% url 'slides:next page' %}" id="student_next" class="btn btn-primary btn-lg">next</a>
     <a href="{% url 'slides:current page' %}" class="btn btn-primary btn-lg">current page</a>
     <br>
     <a href="{% url 'slides:vote up' %}" class="btn btn-success"><i class="fa fa-smile-o fa-3x" aria-hidden="true"></i></a>
     <a href="{% url 'slides:vote down' %}" class="btn btn-danger"><i class="fa fa-frown-o fa-3x" aria-hidden="true"></i></a>
     <br>
-    <form action="/question/" method="post">
+    <form action="{% url 'slides:question' %}" method="post">
+    {% csrf_token %}
 	{{ qform }}
 	<input type="submit" value="Submit" />
     </form>
@@ -95,19 +74,39 @@
     <a href="/slides/" class="btn btn-danger">Main Menu</a>
     <a href="{% url 'slides:logout' %}" class="btn btn-danger">Logout</a>
 
+    <p id="demo"></p>
+
     <!-- jQuery -->
     <script src="{% static 'slides/js/jquery.js' %}"></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="{% static 'slides/js/bootstrap.min.js' %}"></script>
 
+<!--
     <script src="{% static 'slides/js/pdfobject.js' %}"></script>
     <script> PDFObject.embed("../../media/uploads/current.pdf", "#sample");</script>
-
+-->
     <script src="{% static 'slides/js/pdf.js' %}"></script>
 
+    <script>
+      {% if lecturer %}
+      if ({{pageCount}} >= pdf.numPages) {
+        document.getElementById("next").addEventListener("click", function(event) {
+          event.preventDefault()
+        });
+      }
+      {% endif %}
+      {% if student %}
+      if ({{pageCount}} >= pdf.numPages) {
+        document.getElementById("student_next").addEventListener("click", function(event) {
+          event.preventDefault()
+        });
+      }
+      {% endif %}
+    </script>
+
     <script id="script">  
-      var url ="/../../media/uploads/current.pdf";
+      var url ="/../..{{pdffile}}";
       var maxPages = 0;
       var scale = 1.5;
       var canvas = document.getElementById('pdfviewer');
@@ -118,7 +117,7 @@
       PDFJS.getDocument(url).then(function getPdfViewer(pdf) {
         // Fetch the first page
         maxPages = pdf.numPages;
-        pdf.getPage(pageCount).then(function getPageViewer(page) {
+        pdf.getPage({{pageCount}}).then(function getPageViewer(page) {
           viewport = page.getViewport(scale);
           // Prepare canvas using PDF page dimensions
           canvas.height = viewport.height;
@@ -143,7 +142,9 @@
       
     </script>
 
-
+    <script>
+      document.getElementById("demo").innerHTML = url;
+    </script>
 
 
 </body>

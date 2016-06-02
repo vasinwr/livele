@@ -21,18 +21,21 @@ def index(request):
 
 @login_required
 def course_index(request, course):
+    course_group = Group.objects.get(name = course)
     # Handle file upload
     if request.method == 'POST':
         form = PDFForm(request.POST, request.FILES)
         if form.is_valid():
-           form.save()
+            pdf = form.save(commit=False)
+	    pdf.course = course_group
+	    pdf.lecturer = request.user
+	    pdf.save()
             # Redirect to the document list after POST
-           return HttpResponseRedirect(reverse('slides:course_index'))
+	    return HttpResponseRedirect(course)
     else:
         form = PDFForm()  # A empty, unbound form
 
     # Load documents for the list page
-    course_group = Group.objects.get(name = course)
     documents = PDF.objects.filter(course = course_group)
     '''
     return render_to_response(
@@ -78,11 +81,10 @@ def lecture(request):
     bad = votes['bad']
     total = votes['total']
     if(request.user.groups.filter(name = 'Lecturer').count() == 1):
-#felix pass in arguments here::: maybe you want to use pdffile instead of filename and course
-        return render(request, 'slides/lecture.html', {'filename': pdf.filename, 'course':pdf.course, 'pageCount':current.page, 'lecturer':True, 'votes_amplified':bad *100 / total, 'votes_rest': good*100/total})
+        return render(request, 'slides/lecture.html', {'pdffile': pdf.pdffile.url, 'pageCount':current.page, 'lecturer':True, 'votes_amplified':bad *100 / total, 'votes_rest': good*100/total})
     else:
 	question_form = QuestionForm()
-        return render(request, 'slides/lecture.html', {'filename': pdf.filename, 'course':pdf.course, 'pageCount':current.page, 'student':True, 'qform':question_form, 'votes_amplified':bad*100/total, 'votes_rest': good*100/ total})
+        return render(request, 'slides/lecture.html', {'pdffile': pdf.pdffile.url, 'pageCount':current.page, 'student':True, 'qform':question_form, 'votes_amplified':bad*100/total, 'votes_rest': good*100/ total})
 
 def get_votes(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
@@ -111,10 +113,11 @@ def next_page(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
 # felix is there a check in pdf to check if page > last page?
 #    if (current.page +1 <= current.pdf.**lastpage**)
-#	current.page +=1
-#	current.save()
-#	if(request.user.groups.filter(name = 'Lecturer').count() == 1):
-#	    current.pdf.current_page += 1
+    current.page +=1
+    current.save()
+    if(request.user.groups.filter(name = 'Lecturer').count() == 1):
+        current.pdf.current_page += 1
+        current.pdf.save()
     return HttpResponseRedirect(reverse('slides:lecture'))
 
 @login_required
@@ -122,15 +125,17 @@ def prev_page(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
     if (current.page > 1):
 	current.page -= 1
-	current.save
+	current.save()
 	if(request.user.groups.filter(name = 'Lecturer').count() == 1):
 	    current.pdf.current_page -= 1
+            current.pdf.save()
     return HttpResponseRedirect(reverse('slides:lecture'))
 
 @login_required
 def curr_page(request):
     mycurr = get_object_or_404(Current, owner = request.user, active=1)
     mycurr.page = mycurr.pdf.current_page
+    mycurr.save()
     return HttpResponseRedirect(reverse('slides:lecture'))
 
 @login_required
@@ -168,12 +173,16 @@ def vote_down(request):
 @login_required
 def question(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
+    print "question"
 
     if (current.pdf.current_page >= current.page):
+	print "dummy create"
 	dummy = Question(user = request.user, pdf = current.pdf, page = current.page, text = "")
 	dummy.save()
 	question = QuestionForm(request.POST, instance = dummy)
 	question.save()
+    else:
+	pass
     return HttpResponseRedirect(reverse('slides:lecture'))
 
 
