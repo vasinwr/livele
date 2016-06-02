@@ -8,6 +8,7 @@ from django.contrib.auth.models import User, Group
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from django.db.models import Count
 #from .forms import PDFForm
 
 
@@ -80,11 +81,14 @@ def lecture(request):
     good = votes['good']
     bad = votes['bad']
     total = votes['total']
+
     if(request.user.groups.filter(name = 'Lecturer').count() == 1):
         return render(request, 'slides/lecture.html', {'pdffile': pdf.pdffile.url, 'pageCount':current.page, 'lecturer':True, 'votes_amplified':bad *100 / total, 'votes_rest': good*100/total})
     else:
 	question_form = QuestionForm()
-        return render(request, 'slides/lecture.html', {'pdffile': pdf.pdffile.url, 'pageCount':current.page, 'student':True, 'qform':question_form, 'votes_amplified':bad*100/total, 'votes_rest': good*100/ total})
+	curr_qs = Question.objects.filter(pdf = current.pdf, page = current.page)
+	displayQ = curr_qs.annotate(votes = Count('question_vote')).order_by('-votes')
+        return render(request, 'slides/lecture.html', {'pdffile': pdf.pdffile.url, 'pageCount':current.page, 'student':True, 'qform':question_form, 'questions': displayQ, 'votes_amplified':bad*100/total, 'votes_rest': good*100/ total})
 
 def get_votes(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
@@ -181,6 +185,18 @@ def question(request):
 	question.save()
     else:
 	pass
+    return HttpResponseRedirect(reverse('slides:lecture'))
+
+@login_required
+def qvote(request, question):
+    q = get_object_or_404(Question, pk = question)
+
+    try:
+	v = Question_Vote.objects.get(user = request.user, question = q)
+    except Question_Vote.DoesNotExist:
+	v = Question_Vote(user = request.user, question = q)
+	v.save()
+
     return HttpResponseRedirect(reverse('slides:lecture'))
 
 

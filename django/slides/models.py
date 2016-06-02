@@ -78,6 +78,9 @@ class Question_Vote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return str(self.user) +' likes '+ str(self.question)
+
 class QuestionForm(ModelForm):
     class Meta:
 	model = Question

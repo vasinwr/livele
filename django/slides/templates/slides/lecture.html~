@@ -59,9 +59,15 @@
     <br>
     <form action="{% url 'slides:question' %}" method="post">
     {% csrf_token %}
-	{{ qform }}
-	<input type="submit" value="Submit" />
+		{{ qform }}
+		<input type="submit" value="Submit" />
     </form>
+    <br>
+	{% for q in questions %}
+		<p> {{q.text}} : {{q.votes}} votes
+		<a href="qvote/{{q.pk}}" class="btn btn-primary btn-lg">Vote</a>
+		</p>
+	{% endfor %}
     {% endif %}
 
     <h4>Current class status</h4>
@@ -88,6 +94,23 @@
 -->
     <script src="{% static 'slides/js/pdf.js' %}"></script>
 
+    <script>
+      {% if lecturer %}
+      if ({{pageCount}} >= pdf.numPages) {
+        document.getElementById("next").addEventListener("click", function(event) {
+          event.preventDefault()
+        });
+      }
+      {% endif %}
+      {% if student %}
+      if ({{pageCount}} >= pdf.numPages) {
+        document.getElementById("student_next").addEventListener("click", function(event) {
+          event.preventDefault()
+        });
+      }
+      {% endif %}
+    </script>
+
     <script id="script">  
       var url ="/../..{{pdffile}}";
       var maxPages = 0;
@@ -113,21 +136,6 @@
          page.render(renderContext);
         });
       });
-
-      {% if lecturer %}
-      if ({{pageCount}} >= pdf.numPages) {
-        document.getElementById("next").addEventListener("click", function(event) {
-          event.preventDefault()
-        });
-      }
-      {% endif %}
-      {% if student %}
-      if ({{pageCount}} >= pdf.numPages) {
-        document.getElementById("student_next").addEventListener("click", function(event) {
-          event.preventDefault()
-        });
-      }
-      {% endif %}
       
       function getPdf() {
         PDFJS.getDocument(url).then(function getPdfViewer(pdf) {
