@@ -9,7 +9,7 @@ from django.forms import ModelForm
 # Create your models here.
 
 def rename(instance, filename):
-    return '/'.join([instance.course.name, filename])
+    return '/'.join([filename])
 
 class PDF(models.Model):
     filename = models.CharField(max_length=200)
@@ -27,7 +27,7 @@ class PDF(models.Model):
             this = PDF.objects.get(id=self.id)
             if this.pdffile != self.pdffile:
                 this.pdffile.delete(save=False)
-        except: pass # when new photo then we do nothing, normal case          
+        except: pass           
         super(PDF, self).save(*args, **kwargs)
 
 class PDFForm(ModelForm):

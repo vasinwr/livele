@@ -27,13 +27,15 @@ def course_index(request, course):
         if form.is_valid():
            form.save()
             # Redirect to the document list after POST
-           return HttpResponseRedirect(reverse('slides:course_index'))
+           return HttpResponseRedirect(course)
     else:
         form = PDFForm()  # A empty, unbound form
 
     # Load documents for the list page
     course_group = Group.objects.get(name = course)
-    documents = PDF.objects.filter(course = course_group)
+#    documents = PDF.objects.filter(course = course_group)
+    #need to change, above not working
+    documents = PDF.objects.all()
     '''
     return render_to_response(
         'slides/course_index.html',
@@ -110,10 +112,11 @@ def next_page(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
 # felix is there a check in pdf to check if page > last page?
 #    if (current.page +1 <= current.pdf.**lastpage**)
-#	current.page +=1
-#	current.save()
-#	if(request.user.groups.filter(name = 'Lecturer').count() == 1):
-#	    current.pdf.current_page += 1
+    current.page +=1
+    current.save()
+    if(request.user.groups.filter(name = 'Lecturer').count() == 1):
+        current.pdf.current_page += 1
+        current.pdf.save()
     return HttpResponseRedirect(reverse('slides:lecture'))
 
 @login_required
@@ -121,15 +124,17 @@ def prev_page(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
     if (current.page > 1):
 	current.page -= 1
-	current.save
+	current.save()
 	if(request.user.groups.filter(name = 'Lecturer').count() == 1):
 	    current.pdf.current_page -= 1
+            current.pdf.save()
     return HttpResponseRedirect(reverse('slides:lecture'))
 
 @login_required
 def curr_page(request):
     mycurr = get_object_or_404(Current, owner = request.user, active=1)
     mycurr.page = mycurr.pdf.current_page
+    mycurr.save()
     return HttpResponseRedirect(reverse('slides:lecture'))
 
 @login_required

@@ -64,8 +64,8 @@
 
     {% if lecturer %}
 
-    <a href="{% url 'slides:previous page' %}" class="btn btn-primary btn-lg">previous</a>
-    <a href="{% url 'slides:next page' %}" class="btn btn-primary btn-lg">next</a>
+    <a href="{% url 'slides:previous page' %}"  id="prev" class="btn btn-primary btn-lg">previous</a>
+    <a href="{% url 'slides:next page' %}" id="next" class="btn btn-primary btn-lg">next</a>
 <!--
     <input type="button" onclick="decrement()" class="btn btn-primary btn-lg" value="Prev"/>
     <input type="button" onclick="increment()" class="btn btn-primary btn-lg" value="Next"/>
@@ -90,19 +90,22 @@
     <a href="/slides/" class="btn btn-danger">Main Menu</a>
     <a href="{% url 'slides:logout' %}" class="btn btn-danger">Logout</a>
 
+    <p id="demo"></p>
+
     <!-- jQuery -->
     <script src="{% static 'slides/js/jquery.js' %}"></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="{% static 'slides/js/bootstrap.min.js' %}"></script>
 
+<!--
     <script src="{% static 'slides/js/pdfobject.js' %}"></script>
     <script> PDFObject.embed("../../media/uploads/current.pdf", "#sample");</script>
-
+-->
     <script src="{% static 'slides/js/pdf.js' %}"></script>
 
     <script id="script">  
-      var url ="/../../media/uploads/current.pdf";
+      var url ="/../../media/{{filename}}.pdf";
       var maxPages = 0;
       var scale = 1.5;
       var canvas = document.getElementById('pdfviewer');
@@ -113,7 +116,7 @@
       PDFJS.getDocument(url).then(function getPdfViewer(pdf) {
         // Fetch the first page
         maxPages = pdf.numPages;
-        pdf.getPage(pageCount).then(function getPageViewer(page) {
+        pdf.getPage({{pageCount}}).then(function getPageViewer(page) {
           viewport = page.getViewport(scale);
           // Prepare canvas using PDF page dimensions
           canvas.height = viewport.height;
@@ -138,7 +141,9 @@
       
     </script>
 
-
+    <script>
+      document.getElementById("demo").innerHTML = url;
+    </script>
 
 
 </body>
