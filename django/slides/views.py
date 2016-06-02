@@ -3,7 +3,7 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate, login
-from .models import Current, PDF, Votes, PDFForm 
+from .models import Current, PDF, Votes, PDFForm, Question, QuestionForm, Question_Vote
 from django.contrib.auth.models import User, Group
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -81,7 +81,8 @@ def lecture(request):
 #felix pass in arguments here::: maybe you want to use pdffile instead of filename and course
         return render(request, 'slides/lecture.html', {'filename': pdf.filename, 'course':pdf.course, 'pageCount':current.page, 'lecturer':True, 'votes_amplified':bad *100 / total, 'votes_rest': good*100/total})
     else:
-        return render(request, 'slides/lecture.html', {'filename': pdf.filename, 'course':pdf.course, 'pageCount':current.page, 'student':True, 'votes_amplified':bad*100/total, 'votes_rest': good*100/ total})
+	question_form = QuestionForm()
+        return render(request, 'slides/lecture.html', {'filename': pdf.filename, 'course':pdf.course, 'pageCount':current.page, 'student':True, 'qform':question_form, 'votes_amplified':bad*100/total, 'votes_rest': good*100/ total})
 
 def get_votes(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
@@ -162,6 +163,19 @@ def vote_down(request):
         v.send_notification(get_votes(request))
     else:
         pass    
+    return HttpResponseRedirect(reverse('slides:lecture'))
+
+@login_required
+def question(request):
+    current = get_object_or_404(Current, owner = request.user, active=1)
+
+    if (current.pdf.current_page >= current.page):
+	dummy = Question(user = request.user, pdf = current.pdf, page = current.page, text = "")
+	dummy.save()
+	question = QuestionForm(request.POST, instance = dummy)
+	question.save()
+    else:
+	pass
     return HttpResponseRedirect(reverse('slides:lecture'))
 
 

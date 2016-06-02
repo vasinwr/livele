@@ -50,6 +50,9 @@ class Votes(models.Model):
     page = models.IntegerField()
     value = models.IntegerField(default=0)
 
+    def __str__(self):
+        return self.user +' '+ str(self.pdf) +' '+ str(self.page)  + ('happy' if (self.value == 0) else 'unhappy')
+
     def send_notification(self, votes):
         good = votes['good'] * 100 / votes['total']
         bad = votes['bad'] * 100 / votes['total']
@@ -62,6 +65,20 @@ class Votes(models.Model):
         })
 
 
-#class PdfModel(models.Model):
-#    pdffile = models.FileField(upload_to=rename)
+class Question(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    pdf = models.ForeignKey(PDF, on_delete=models.CASCADE)
+    page = models.IntegerField()
+    text = models.TextField()
 
+    def __str__(self):
+        return self.user +' '+ str(self.pdf) +' '+ str(self.page)  + self.text
+
+class Question_Vote(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+
+class QuestionForm(ModelForm):
+    class Meta:
+	model = Question
+	fields = ['text']

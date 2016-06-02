@@ -22,37 +22,72 @@
     <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
-
     <script>
-       setTimeout(function(){
-           window.location.reload(1);
-       }, 5000);
+       socket = new WebSocket("ws://127.0.0.1:8000/all/");
+       socket.onmessage = function(message){
+         var data = JSON.parse(message.data);
+         if(data.green_bar || data.red_bar){
+           document.getElementById("red_bar").style.width = data.red_bar + '%';
+           document.getElementById("green_bar").style.width = data.green_bar + '%';
+         }
+       }
     </script>
+<!--
+    <script>
+        var pageCount = 1;
+        function increment() {
+            if (pageCount == maxPages)
+                return;
+            pageCount++;
+            getPdf();
+        }
+        function decrement() {
+            if (pageCount == 1)
+                return;
+            pageCount--;
+            getPdf();
+        }
+    </script>
+
+-->
+
 </head>
 
 <body id="page-top" class="index">
     <h1>Slide</h1>
+<!--
     <img src="{{ slide.img_source }}" width='70%'>
 
+    <div id="sample" style="height:500px; width:700px"></div>
+-->
+    <canvas id="pdfviewer" style="border:1px solid black; height:500px; width:700px"></canvas>
+
     {% if lecturer %}
+
     <a href="{% url 'slides:previous page' %}" class="btn btn-primary btn-lg">previous</a>
     <a href="{% url 'slides:next page' %}" class="btn btn-primary btn-lg">next</a>
+<!--
+    <input type="button" onclick="decrement()" class="btn btn-primary btn-lg" value="Prev"/>
+    <input type="button" onclick="increment()" class="btn btn-primary btn-lg" value="Next"/>
+-->
     {% endif %}
     {% if student %}
     <a href="{% url 'slides:previous page' %}" class="btn btn-primary btn-lg">previous</a>
     <a href="{% url 'slides:next page' %}" class="btn btn-primary btn-lg">next</a>
     <a href="{% url 'slides:current page' %}" class="btn btn-primary btn-lg">current page</a>
+    <br>
     <a href="{% url 'slides:vote up' %}" class="btn btn-success"><i class="fa fa-smile-o fa-3x" aria-hidden="true"></i></a>
     <a href="{% url 'slides:vote down' %}" class="btn btn-danger"><i class="fa fa-frown-o fa-3x" aria-hidden="true"></i></a>
     {% endif %}
 
     <h4>Current class status</h4>
     <div class="progress progress-striped active">
-        <div class="progress-bar progress-bar-danger" style="width: {{ votes_amplified }}%"></div>
+        <div id="red_bar" class="progress-bar progress-bar-danger" style="width: {{ votes_amplified }}%"></div>
         <div class="progress-bar progress-bar-warning" style="width: 0%"></div>
-        <div class="progress-bar progress-bar-success" style="width: {{ votes_rest }}%"></div>
+        <div id="green_bar" class="progress-bar progress-bar-success" style="width: {{ votes_rest }}%"></div>
     </div>
 
+    <a href="/slides/" class="btn btn-danger">Main Menu</a>
     <a href="{% url 'slides:logout' %}" class="btn btn-danger">Logout</a>
 
     <!-- jQuery -->
@@ -60,6 +95,50 @@
 
     <!-- Bootstrap Core JavaScript -->
     <script src="{% static 'slides/js/bootstrap.min.js' %}"></script>
+
+    <script src="{% static 'slides/js/pdfobject.js' %}"></script>
+    <script> PDFObject.embed("../../media/uploads/current.pdf", "#sample");</script>
+
+    <script src="{% static 'slides/js/pdf.js' %}"></script>
+
+    <script id="script">  
+      var url ="/../../media/uploads/current.pdf";
+      var maxPages = 0;
+      var scale = 1.5;
+      var canvas = document.getElementById('pdfviewer');
+      var context = canvas.getContext('2d');
+      var viewport = 0;
+      var renderContext = 0;
+      PDFJS.workerSrc = "{% static 'slides/js/pdf.worker.js' %}";
+      PDFJS.getDocument(url).then(function getPdfViewer(pdf) {
+        // Fetch the first page
+        maxPages = pdf.numPages;
+        pdf.getPage(pageCount).then(function getPageViewer(page) {
+          viewport = page.getViewport(scale);
+          // Prepare canvas using PDF page dimensions
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+          // Render PDF page into canvas context
+          renderContext = {
+            canvasContext: context,
+            viewport: viewport
+          };
+         page.render(renderContext);
+        });
+      });
+      
+      function getPdf() {
+        PDFJS.getDocument(url).then(function getPdfViewer(pdf) {
+          pdf.getPage(pageCount).then(function getPageViewer(page) {
+            page.render(renderContext);
+          });
+        });
+      };
+      getPdf();
+      
+    </script>
+
+
 
 
 </body>

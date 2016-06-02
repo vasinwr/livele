@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^lecture/curr_page/', views.curr_page, name='current page'),
     url(r'^lecture/vote_up/', views.vote_up, name='vote up'),
     url(r'^lecture/vote_down/', views.vote_down, name='vote down'),
+    url(r'^lecture/question/', views.question, name='question'),
     #lecture/ must be at the bottom otherwise it will always be matched first
     url(r'^lecture/', views.lecture, name='lecture'),
 ]

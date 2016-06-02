@@ -3,7 +3,7 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate, login
-from .models import Current, PDF, Votes, PDFForm 
+from .models import Current, PDF, Votes, PDFForm, Question, QuestionForm, Question_Vote
 from django.contrib.auth.models import User, Group
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -48,7 +48,7 @@ def course_index(request, course):
         return render(request, 'slides/course_index.html', {'course': course, 'documents': documents, 'form': form})
 
 @login_required
-def select(request, name):
+def select(request, key):
 #deactive all other actives.
     try:
         other = Current.objects.get(owner = request.user, active=1)
@@ -58,7 +58,7 @@ def select(request, name):
         pass
 
     try:
-	curr_pdf = PDF.objects.get(filename = name)
+	curr_pdf = PDF.objects.get(pk = key)
         current = Current.objects.get(owner = request.user, pdf = curr_pdf)
         current.active = 1
         current.save()
@@ -78,10 +78,11 @@ def lecture(request):
     bad = votes['bad']
     total = votes['total']
     if(request.user.groups.filter(name = 'Lecturer').count() == 1):
-#felix pass in arguments here
+#felix pass in arguments here::: maybe you want to use pdffile instead of filename and course
         return render(request, 'slides/lecture.html', {'filename': pdf.filename, 'course':pdf.course, 'pageCount':current.page, 'lecturer':True, 'votes_amplified':bad *100 / total, 'votes_rest': good*100/total})
     else:
-        return render(request, 'slides/lecture.html', {'filename': pdf.filename, 'course':pdf.course, 'pageCount':current.page, 'student':True, 'votes_amplified':bad*100/total, 'votes_rest': good*100/ total})
+	question_form = QuestionForm()
+        return render(request, 'slides/lecture.html', {'filename': pdf.filename, 'course':pdf.course, 'pageCount':current.page, 'student':True, 'qform':question_form, 'votes_amplified':bad*100/total, 'votes_rest': good*100/ total})
 
 def get_votes(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
@@ -162,6 +163,17 @@ def vote_down(request):
         v.send_notification(get_votes(request))
     else:
         pass    
+    return HttpResponseRedirect(reverse('slides:lecture'))
+
+@login_required
+def question(request):
+    current = get_object_or_404(Current, owner = request.user, active=1)
+
+    if (current.pdf.current_page >= current.page):
+	dummy = Question(user = request.user, pdf = current.pdf, page = current.page, text = "")
+	dummy.save()
+	question = QuestionForm(request.POST, instance = dummy)
+	question.save()
     return HttpResponseRedirect(reverse('slides:lecture'))
 
 
