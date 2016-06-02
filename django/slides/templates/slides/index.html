@@ -29,11 +29,14 @@
     <div>
     <!-- List of uploaded documents -->
     {% if documents %}
-        <ul>
-            <li><a href="{{ documents.0.pdffile.url }}">{{ documents.0.pdffile.name }}</a></li>
-        </ul>
+        {% for document in documents %}
+            <p> {{document.lecture}} : 
+                <a href="{{ document.pdffile.url }}">{{ document.pdffile.name }}</a>
+            <a href="/slides/select/{{document.lecture}}" class="btn btn-primary btn-lg">{{document.lecture}}</a>
+            </p>
+        {% endfor %}
     {% else %}
-        <p>No documents.</p>
+        <p>No Lectures.</p>
     {% endif %}
     </div>
 
@@ -43,9 +46,9 @@
         <!-- Upload form. Note enctype attribute! -->
         <form action="{% url 'slides:index' %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
+            <div id="Input">
+            <p> Lecture: {{ form.lecture }} </p>
             <p>{{ form.non_field_errors }}</p>
-
-            <p>{{ form.pdffile.label_tag }} {{ form.pdffile.help_text }}</p>
 
             <p>
                 {{ form.pdffile.errors }}
@@ -53,8 +56,8 @@
             </p>
 
             <input type="submit" class="btn btn-danger" value="Upload"/>
+            </div>
         </form>
-
     {% endif %}
     </div>
    
@@ -67,35 +70,26 @@
     <script src="{% static 'slides/js/bootstrap.min.js' %}"></script>
 
     <script>
-        function addLecture() {
-            var div = document.createElement('div');
-            div.className = 'lecture';
-             
-            div.innerHTML = '
-        {% if documents %}
-            <ul>
-                <li><a href="{{ documents.0.pdffile.url }}">{{ documents.0.pdffile.name }}</a></li>
-            </ul>
-        {% else %}
-            <p>No documents.</p>
-        {% endif %}
-
-        <!-- Upload form. Note enctype attribute! -->
-        <form action="{% url 'slides:index' %}" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <p>{{ form.non_field_errors }}</p>
-
-            <p>{{ form.pdffile.label_tag }} {{ form.pdffile.help_text }}</p>
-
-            <p>
-                {{ form.pdffile.errors }}
-                {{ form.pdffile }}
-            </p>
-
-            <input type="submit" class="btn btn-danger" value="Upload"/>
-        </form>'
+        var lectureCount = 0; 
+        
+        function addLecture(parentId, childId) {
+          var par = document.getElementById(parentId);
+          var child = document.createElement('div');
+          child.setAttribute('id', childId);
+          child.innerHTML = 'Lecture Name: <input type="text" name="lectureInputs[]"/>\<p>{{ form.non_field_errors }}</p>\<p>{{ form.pdffile.label_tag }} {{ form.pdffile.help_text }}</p>\<p>{{ form.pdffile.errors }}\{{ form.pdffile }}\</p>\<input type="button" onclick="javascript:removeLecture(lectureCount)" class="btn btn-danger" value="Remove"/>\<input type="button" class="btn btn-danger" value="Add Lecture"/>';
+          par.appendChild(child);
+          child.download = "index.html";
         }
 
+        function removeLecture(lectureNum) {
+          document.getElementById('Lecture ' + lectureNum).parentNode.removeChild(elem);
+        }
+
+        function add() {
+          lectureCount++;
+          addLecture('Input', 'Lecture ' + lectureCount);
+        }
+    </script>
 </body>
 
 </html>

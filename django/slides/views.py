@@ -3,30 +3,28 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate, login
-from .models import Current, PDF, Votes 
+from .models import Current, PDF, Votes, PDFForm 
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from .forms import PdfForm
+#from .forms import PDFForm
 
 
 # Create your views here.
+
 
 @login_required
 def index(request):
     # Handle file upload
     if request.method == 'POST':
-        form = PdfForm(request.POST, request.FILES)
+        form = PDFForm(request.POST, request.FILES)
         if form.is_valid():
-# felix please fix
-#            newdoc = PDF(pdffile=request.FILES['pdffile'])
-#            newdoc.save()
-
+           form.save()
             # Redirect to the document list after POST
-            return HttpResponseRedirect(reverse('slides:index'))
+           return HttpResponseRedirect(reverse('slides:index'))
     else:
-        form = PdfForm()  # A empty, unbound form
+        form = PDFForm()  # A empty, unbound form
 
     # Load documents for the list page 
     # for now, all is ok, we will change to filter (course ) later

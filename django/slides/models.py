@@ -4,17 +4,39 @@ from django.contrib.auth.models import User, Group
 from channels import Group as Channel_Group
 from django.shortcuts import get_object_or_404
 import os
+from django.forms import ModelForm
 
 # Create your models here.
+
+def rename(instance, filename):
+    return '/'.join([instance.course.name, filename])
 
 class PDF(models.Model):
     filename = models.CharField(max_length=200)
     course = models.ForeignKey(Group, on_delete=models.CASCADE, default = 1)
     lecturer = models.ForeignKey(User, on_delete=models.CASCADE, default = 1)
-    current_page = models.IntegerField()
+    current_page = models.IntegerField(default = 1)
+    pdffile = models.FileField(upload_to=rename)
+    lecture = models.CharField(max_length=50)
 
     def __str__(self):
         return self.filename
+
+    def save(self, *args, **kwargs):
+        # delete old file when replacing by updating the file
+        try:
+            this = PDF.objects.get(id=self.id)
+            if this.pdffile != self.pdffile:
+                this.pdffile.delete(save=False)
+        except: pass # when new photo then we do nothing, normal case          
+        super(PDF, self).save(*args, **kwargs)
+
+class PDFForm(ModelForm):
+#    lecture = forms.CharField(required=False)
+#    pdffile = forms.FileField(label='Select a file')
+    class Meta:
+        model = PDF
+        fields = ['pdffile', 'lecture']
 
 class Current(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, default = 1)
@@ -42,14 +64,7 @@ class Votes(models.Model):
             "text": json.dumps(notification),
         })
 
-#def rename(instance, filename):
-#    ext = filename.split('.')[-1]
-#    filename = "current.%s" % (ext)
-#    directory = os.path.join('media/uploads', filename)
-#    if os.path.isfile(directory):
-#        os.remove(directory)
-#    return os.path.join('uploads', filename)
 
-#class Pdf(models.Model):
+#class PdfModel(models.Model):
 #    pdffile = models.FileField(upload_to=rename)
 
