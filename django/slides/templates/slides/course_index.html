@@ -1,0 +1,95 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{{course}}</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'slides/css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{% static 'slides/css/lumen.css' %}" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="{% static 'slides/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
+</head>
+
+<body id="page-top" class="index">
+    <h1>{{course}}</h1>
+    <div>
+    <!-- List of uploaded documents -->
+    {% if documents %}
+        {% for document in documents %}
+            <p> {{document.filename}} : 
+                <a href="{{ document.pdffile.url }}">{{ document.pdffile.name }}</a>
+            <a href="/slides/select/{{document.pk}}" class="btn btn-primary btn-lg">{{document.filename}}</a>
+            </p>
+        {% endfor %}
+    {% else %}
+        <p>No Lectures.</p>
+    {% endif %}
+    </div>
+
+    <div>
+    {% if lecturer %}
+
+        <!-- Upload form. Note enctype attribute! -->
+        <form action="{% url 'slides:index' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div id="Input">
+            <p> Lecture: {{ form.filename }} </p>
+            <p>{{ form.non_field_errors }}</p>
+
+            <p>
+                {{ form.pdffile.errors }}
+                {{ form.pdffile }}
+            </p>
+
+            <input type="submit" class="btn btn-danger" value="Upload"/>
+            </div>
+        </form>
+    {% endif %}
+    </div>
+   
+    <a href="{% url 'slides:logout' %}" class="btn btn-danger">Logout</a>
+
+    <!-- jQuery -->
+    <script src="{% static 'slides/js/jquery.js' %}"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{% static 'slides/js/bootstrap.min.js' %}"></script>
+
+    <script>
+        var lectureCount = 0; 
+        
+        function addLecture(parentId, childId) {
+          var par = document.getElementById(parentId);
+          var child = document.createElement('div');
+          child.setAttribute('id', childId);
+          child.innerHTML = 'Lecture Name: <input type="text" name="lectureInputs[]"/>\<p>{{ form.non_field_errors }}</p>\<p>{{ form.pdffile.label_tag }} {{ form.pdffile.help_text }}</p>\<p>{{ form.pdffile.errors }}\{{ form.pdffile }}\</p>\<input type="button" onclick="javascript:removeLecture(lectureCount)" class="btn btn-danger" value="Remove"/>\<input type="button" class="btn btn-danger" value="Add Lecture"/>';
+          par.appendChild(child);
+          child.download = "index.html";
+        }
+
+        function removeLecture(lectureNum) {
+          document.getElementById('Lecture ' + lectureNum).parentNode.removeChild(elem);
+        }
+
+        function add() {
+          lectureCount++;
+          addLecture('Input', 'Lecture ' + lectureCount);
+        }
+    </script>
+</body>
+
+</html>

@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Lecture</title>
+    <title>Courses</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="{% static 'slides/css/bootstrap.min.css' %}" rel="stylesheet">
@@ -25,12 +25,21 @@
 </head>
 
 <body id="page-top" class="index">
-    <h1>Lectures</h1>
+    <h1>Courses</h1>
+    <div>
+    <!-- List of user courses -->
+    {% if courses %}
+        {% for course in courses %}
+	    <p>
+            <a href="/slides/course_index/{{course}}" class="btn btn-primary btn-lg">{{course}}</a>
+            </p>
+        {% endfor %}
+    {% else %}
+        <p>User has not subscribed to any courses.</p>
+    {% endif %}
+    </div>
 
-    {% for lecture in lectureList %}
-	<li><a href="/slides/select/{{lecture}}" class="btn btn-primary btn-lg">{{lecture}}</a></li>
-    {% endfor %}
-
+ 
     <a href="{% url 'slides:logout' %}" class="btn btn-danger">Logout</a>
 
     <!-- jQuery -->
@@ -38,7 +47,6 @@
 
     <!-- Bootstrap Core JavaScript -->
     <script src="{% static 'slides/js/bootstrap.min.js' %}"></script>
-
 
 </body>
 
