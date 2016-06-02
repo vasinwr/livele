@@ -30,9 +30,9 @@
     <!-- List of uploaded documents -->
     {% if documents %}
         {% for document in documents %}
-            <p> {{document.lecture}} : 
+            <p> {{document.filename}} : 
                 <a href="{{ document.pdffile.url }}">{{ document.pdffile.name }}</a>
-            <a href="/slides/select/{{document.lecture}}" class="btn btn-primary btn-lg">{{document.lecture}}</a>
+            <a href="/slides/select/{{document.filename}}" class="btn btn-primary btn-lg">{{document.filename}}</a>
             </p>
         {% endfor %}
     {% else %}
@@ -47,7 +47,7 @@
         <form action="{% url 'slides:index' %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div id="Input">
-            <p> Lecture: {{ form.lecture }} </p>
+            <p> Lecture: {{ form.filename }} </p>
             <p>{{ form.non_field_errors }}</p>
 
             <p>

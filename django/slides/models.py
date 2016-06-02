@@ -17,7 +17,6 @@ class PDF(models.Model):
     lecturer = models.ForeignKey(User, on_delete=models.CASCADE, default = 1)
     current_page = models.IntegerField(default = 1)
     pdffile = models.FileField(upload_to=rename)
-    lecture = models.CharField(max_length=50)
 
     def __str__(self):
         return self.filename
@@ -32,11 +31,9 @@ class PDF(models.Model):
         super(PDF, self).save(*args, **kwargs)
 
 class PDFForm(ModelForm):
-#    lecture = forms.CharField(required=False)
-#    pdffile = forms.FileField(label='Select a file')
     class Meta:
         model = PDF
-        fields = ['pdffile', 'lecture']
+        fields = ['pdffile', 'filename']
 
 class Current(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, default = 1)
