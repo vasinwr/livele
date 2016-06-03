@@ -29,7 +29,7 @@
     <div>
     <!-- List of questions -->
     {% if questions %}
-        {% for question in questions %}
+        {% for q in questions %}
 		<p> {{q.text}} : {{q.votes}} votes
 		</p>
         {% endfor %}

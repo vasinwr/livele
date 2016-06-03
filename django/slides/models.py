@@ -83,5 +83,5 @@ class Question_Vote(models.Model):
 
 class QuestionForm(ModelForm):
     class Meta:
-	model = Question
-	fields = ['text']
+        model = Question
+        fields = ['text']
