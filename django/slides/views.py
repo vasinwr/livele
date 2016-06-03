@@ -203,7 +203,7 @@ def qvote(request, question):
 def show_questions(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
 
-    curr_qs = Question.objects.filter(pdf = current.pdf, page = current.page)
+    curr_qs = Question.objects.filter(pdf = current.pdf)
     displayQ = curr_qs.annotate(votes = Count('question_vote')).order_by('-votes')
 
     return render(request, 'slides/questions.html', {'questions':displayQ})
