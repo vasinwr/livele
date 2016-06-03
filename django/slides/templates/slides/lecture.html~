@@ -94,24 +94,8 @@
 -->
     <script src="{% static 'slides/js/pdf.js' %}"></script>
 
-    <script>
-      {% if lecturer %}
-      if ({{pageCount}} >= pdf.numPages) {
-        document.getElementById("next").addEventListener("click", function(event) {
-          event.preventDefault()
-        });
-      }
-      {% endif %}
-      {% if student %}
-      if ({{pageCount}} >= pdf.numPages) {
-        document.getElementById("student_next").addEventListener("click", function(event) {
-          event.preventDefault()
-        });
-      }
-      {% endif %}
-    </script>
 
-    <script id="script">  
+    <script>  
       var url ="/../..{{pdffile}}";
       var maxPages = 0;
       var scale = 1.5;
@@ -119,37 +103,52 @@
       var context = canvas.getContext('2d');
       var viewport = 0;
       var renderContext = 0;
-      PDFJS.workerSrc = "{% static 'slides/js/pdf.worker.js' %}";
-      PDFJS.getDocument(url).then(function getPdfViewer(pdf) {
-        // Fetch the first page
-        maxPages = pdf.numPages;
-        pdf.getPage({{pageCount}}).then(function getPageViewer(page) {
-          viewport = page.getViewport(scale);
-          // Prepare canvas using PDF page dimensions
-          canvas.height = viewport.height;
-          canvas.width = viewport.width;
-          // Render PDF page into canvas context
-          renderContext = {
-            canvasContext: context,
-            viewport: viewport
-          };
-         page.render(renderContext);
-        });
-      });
-      
-      function getPdf() {
+      getPDF();
+      function getPDF() {
+        PDFJS.workerSrc = "{% static 'slides/js/pdf.worker.js' %}";
         PDFJS.getDocument(url).then(function getPdfViewer(pdf) {
-          pdf.getPage(pageCount).then(function getPageViewer(page) {
-            page.render(renderContext);
+          // Fetch the first page
+          maxPages = pdf.numPages;
+          pdf.getPage({{pageCount}}).then(function getPageViewer(page) {
+            viewport = page.getViewport(scale);
+            // Prepare canvas using PDF page dimensions
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            // Render PDF page into canvas context
+            renderContext = {
+              canvasContext: context,
+              viewport: viewport
+            };
+           page.render(renderContext);
           });
+          checkmax();
         });
-      };
-      getPdf();
+      }
       
     </script>
 
     <script>
-      document.getElementById("demo").innerHTML = url;
+      function checkmax() {
+        {% if lecturer %}
+        if ({{pageCount}} >= maxPages) {
+     
+          document.getElementById("next").addEventListener("click", function(event) {
+            event.preventDefault()
+          });
+        }
+        {% endif %}
+        {% if student %}
+        if ({{pageCount}} >= maxPages) {
+          document.getElementById("student_next").addEventListener("click", function(event) {
+            event.preventDefault()
+          });
+        }
+        {% endif %}
+      }
+    </script>
+
+    <script>
+//      document.getElementById("demo").innerHTML = maxPages; 
     </script>
 
 

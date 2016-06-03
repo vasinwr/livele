@@ -47,6 +47,7 @@
     {% if lecturer %}
     <a href="{% url 'slides:previous page' %}" id="prev" class="btn btn-primary btn-lg">Previous</a>
     <a href="{% url 'slides:next page' %}" id="next" class="btn btn-primary btn-lg">Next</a>
+    <li><a href="{% url 'slides:show questions' %}" class="btn btn-primary btn-lg">Questions</a></li>
 
     {% endif %}
     {% if student %}

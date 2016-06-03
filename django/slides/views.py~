@@ -87,7 +87,7 @@ def lecture(request):
     else:
 	question_form = QuestionForm()
 	curr_qs = Question.objects.filter(pdf = current.pdf, page = current.page)
-	displayQ = curr_qs.annotate(votes = Count('question_vote'))
+	displayQ = curr_qs.annotate(votes = Count('question_vote')).order_by('-votes')
         return render(request, 'slides/lecture.html', {'pdffile': pdf.pdffile.url, 'pageCount':current.page, 'student':True, 'qform':question_form, 'questions': displayQ, 'votes_amplified':bad*100/total, 'votes_rest': good*100/ total})
 
 def get_votes(request):
