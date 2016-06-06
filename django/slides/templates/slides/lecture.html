@@ -47,6 +47,7 @@
     {% if lecturer %}
     <a href="{% url 'slides:previous page' %}" id="prev" class="btn btn-primary btn-lg">Previous</a>
     <a href="{% url 'slides:next page' %}" id="next" class="btn btn-primary btn-lg">Next</a>
+    <li><a href="{% url 'slides:show questions' %}" class="btn btn-primary btn-lg">Questions</a></li>
 
     {% endif %}
     {% if student %}
@@ -59,9 +60,15 @@
     <br>
     <form action="{% url 'slides:question' %}" method="post">
     {% csrf_token %}
-	{{ qform }}
-	<input type="submit" value="Submit" />
+		{{ qform }}
+		<input type="submit" value="Submit" />
     </form>
+    <br>
+	{% for q in questions %}
+		<p> {{q.text}} : {{q.votes}} votes
+		<a href="qvote/{{q.pk}}" class="btn btn-primary btn-lg">Vote</a>
+		</p>
+	{% endfor %}
     {% endif %}
 
     <h4>Current class status</h4>

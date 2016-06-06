@@ -69,7 +69,7 @@ class Question(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     pdf = models.ForeignKey(PDF, on_delete=models.CASCADE)
     page = models.IntegerField()
-    text = models.TextField()
+    text = models.TextField(verbose_name = 'Question')
 
     def __str__(self):
         return str(self.user) +' '+ str(self.pdf) +' page'+ str(self.page)+' '  + self.text

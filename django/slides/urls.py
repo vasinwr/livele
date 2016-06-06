@@ -18,6 +18,8 @@ urlpatterns = [
     url(r'^lecture/vote_up/', views.vote_up, name='vote up'),
     url(r'^lecture/vote_down/', views.vote_down, name='vote down'),
     url(r'^lecture/question/', views.question, name='question'),
+    url(r'^lecture/qvote/([a-zA-Z0-9_]+)', views.qvote, name='qvote'),
+    url(r'^lecture/show_questions/', views.show_questions, name='show questions'),
     #lecture/ must be at the bottom otherwise it will always be matched first
     url(r'^lecture/', views.lecture, name='lecture'),
 ]
