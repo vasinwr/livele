@@ -51,7 +51,7 @@
 \begin{figure}[h]
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[width=.6\linewidth]{gulp_build.png}
+  \includegraphics[width=.9\linewidth]{gulp_build.png}
   \caption{Frontend build using gulp}
 \end{minipage}%
 \begin{minipage}{.5\textwidth}

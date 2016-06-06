@@ -17,7 +17,7 @@
 \begin{minipage}{1.0\textwidth}
   \centering
   \includegraphics[width=.9\linewidth]{systemdiagram.jpg}
-  \caption{there is a plan to switch from sqlite to postgresql}
+  \caption{$^{*}$ there is a plan to switch from sqlite to postgresql}
 \end{minipage}
 \end{figure}
 
