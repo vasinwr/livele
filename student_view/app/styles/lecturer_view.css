@@ -1,0 +1,49 @@
+html, body{
+  height: 100%;
+}
+
+#pdfviewer {
+  position: relative;
+  height:100%;
+  width:100%;
+  /*min-width:600px;*/
+  max-width:1200px;
+  box-shadow: 0px 0px 20px #000000;
+}
+
+#bar {
+  position: absolute;
+  left: 20%;
+  top: 90%;
+  text-align: center;
+  width : 100%;
+}
+
+.center {
+    margin: auto;
+    width: 60px;
+    padding: 5px;
+    text-align: center;
+    color: #777777;
+    background-color: #FFC6C6;
+    box-shadow: 0px 0px 15px #dddddd;
+}
+
+.Bar-Container{
+  position: absolute;
+  width: 50%;
+  margin: auto;
+  bottom: 0px; left:0; right:0;
+  text-align: center;
+}
+
+
+
+.Leftpage-Container {
+  position: relative;
+  left: 2%;
+  top: 2%;
+  width: 50%;
+  border-style: solid;
+  border-color: black; 
+}
