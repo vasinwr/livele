@@ -1,6 +1,4 @@
 console.log('asdf');
-Mousetrap.bind(['right','space'], function() { alert('next page') });
-Mousetrap.bind('left', function() { alert('previous page') });
 
 var app = angular.module('lecture',[]);
 app.controller('MenuController', function(){
@@ -28,3 +26,6 @@ app.controller('SidesController', function(){
   this.left_hover = false; 
   this.right_hover = false;
 });
+
+Mousetrap.bind(['right','space'], function() { alert('next page') });
+Mousetrap.bind('left', function() { alert('previous page') });
