@@ -24,4 +24,5 @@ urlpatterns = [
     url(r'^slides/', include('slides.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^accounts/', include('slides.urls')),
+    url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
