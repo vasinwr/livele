@@ -1,0 +1,44 @@
+\documentclass[11pt]{article}
+
+\usepackage{fullpage}
+\usepackage{booktabs}
+
+\addtolength{\topmargin}{-0.6in}
+\addtolength{\textheight}{1in}
+
+\begin{document}
+
+\title{Webapps Group Project: Copyright / Legal Issues Report}
+\author{Group 21: Kam Chiu, Ho Law, Jiranart Vacheesuthum, Vasin Wongrassamee}
+
+\maketitle
+
+\section{Acknowledgements}
+The following libraries and frameworks have been used in this project.
+
+\begin{table}[h!]
+  \centering
+  \caption{Libraries and Frameworks used in this project}
+  \begin{tabular}{|c|c|c|}
+    \toprule
+    & Copyright holder & License\\
+    \midrule
+    Django web framework & Django Software Foundation & BSD\\
+    channels & Andrew Godwin & BSD\\
+    django-cors-headers & Otto Yiu & MIT\\
+    Mousetrap & C Campbell & Apache\\
+    PDF.js & Mozilla and individual contributors & Apache\\
+    Bootstrap & Bootstrap Core Team & MIT\\
+    Lumen & Thomas Park & MIT\\
+    Yeoman & Yeoman & BSD\\
+    Gulp & Fractal & MIT\\
+    Bower & Twitter and other contributors & MIT\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Legal Issues}
+\subsection{MIT license}
+\emph{django-cors-headers}, \emph{Bootstrap}, \emph{Lumen}, \emph{}
+
+\end{document}

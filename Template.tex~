@@ -1,0 +1,148 @@
+\documentclass[11pt]{article}
+
+\usepackage{fullpage}
+
+\begin{document}
+
+\title{Report on ARM11 Project and extension: Tower Stack}
+\author{Kam Chiu, Ho Law, Jiranart Vacheesuthum, Vasin Wongrassamee}
+
+\maketitle
+
+\section{Introduction}
+
+This report covers the details of the design of our ARM11 Project, the challenges we overcame at each stage, and our reflections on the work. It includes the following sections:
+
+\begin{itemize}
+  \item Details on the emulator
+  \item Details on the assembler
+  \item Details on the extension
+  \item Testing
+  \item Group and individual reflections
+\end{itemize}
+
+\section{Details on the emulator}
+
+Our emulator has the initialisation code in the Main function in emulate.c. The binary file loader loads 32 bit instructions into an array of unsigned long ints. This array is stored in the heap, and represents the main memory. The register structure is also initialised. The register structure includes 13 general purpose registers, the PC and CPSR. They are represented as another array of unsigned long ints, stored on the stack because of its fixed, relatively small size. The pipeline is a simple structure consisting of two unsinged long ints.
+
+\medskip
+
+The pipeline fetches instructions and increments the PC as described in the specification. An "execute" method takes each instruction and checks the condition specified against the CPSR. It then matches bit patterns to determine the type of instruction to be executed, and calls the respective method. The whole instruction is then passed as an argument. 
+
+\medskip
+
+This structure roughly resembles our work division, as each method called handles a different type of ARM instruction: data processing, multiply, single data transfer, and branch. Each method extracts any flags, opcodes, registers and offsets required by that specific instruction type from the instruction given. The branch instruction is handled locally due to its extensisve interactions with the pipeline and the PC.
+
+\section{Details on the assembler}
+
+We have implemented the assembler in a way that it performs two passes, building a table of labels and address in the first. As any print statements do not affect the final assembled result, we have made a lot of use of printf statements in order to check what we were working with at several points. Each instruction is broken down in to a set of up to 6 tokens using the strtok() function. This perfectly separates every arguments including registers and constants so that they can be easily handled by the functions we are going to use to convert them. The content of the first token can identify which 'handler' we want to use. Having that as a switch to call handlers, the content of all the tokens for that instruction is passed into each handler to be processed into a 32-bit word.
+
+\medskip
+
+The data processing handler is divided into 3 further sub-handlers based on their similarities in instruction format. This includes the compute handler, the mov handler, and the CPSR handler. The functionality of strcmp() is frequently used to identify and detect a string token in order to set the bits accordingly.  Despite the fact that the 3 types of function, one for each handler, operate differently, all of them share a common call to a sub function operandHanlder(). This function is responsible for setting the bits 0 to 11 for all the instruction passed into these 3 sub-handlers. By passing different arguments depending on the instruction format, this gives us the advantage of not having to repeat codes in one file. 
+
+\medskip
+
+Instructions for branching to labels are passed into the branch handler. Basic string comparison is carry out with the mnemonic in order to identify the conditions for branching and set the condition field at bits 28 to 31 accordingly. Here the first pass table is also used to retrieve the address of the labels in order to calculate the offset bits of the instruction.
+
+\medskip
+
+The two types of multiply instructions, multiply with syntax and multiply with accumulate and syntax are handled separately in 'MultiplyHandler.c'. These primarily focus on retrieving the register number in integer format from a string using atoi() function. These register numbers are then set the bits that correspond to the instruction format. 
+
+\medskip
+	
+Lastly, the single data transfer handler is responsible for store and load instructions. All of the tokens are passed into one single function and the bits functionality they share in common are set during the start of the execution e.g. determining store or load bits and destination register bits. To meet the specifications of having to print contents at the end of the file for 'loading with a large constant case', we have passed the pointer to the output buffer into this handler. The final number of outputs, which is calculated in main and passed through to this handler, is essential to locate where to write this constant to as well as calculating the offset to reach it. The pointer to output number is also passed to this so that it can be incremented, as we now have one more output. The reason this is separate from the 'real' output number in the main because if we use the same number, incrementing will result in faults in output order. The rest of the bit setting is carry out by regular string comparison from strcmp() and integer extraction from atoi(). We have also implemented this handler so that it supports 'register as an offset' as well as 'shifting with a hexadecimal format constant'.
+
+\medskip
+	
+Overall, the assembler also makes a good use of 'util.c', where we have defined a number of simple functions. For example, setBin() is used to set bits we desired in a unsigned long int, this does not really help with efficiency, but makes the code cleaner. 
+
+\section{Details on the extension}
+
+We have made a Tower Stacker game for the project extension. The outputs are shown on a set of 15 LEDs representing a 3x5 pixels screen and the input is a single vertical button connected to a GPIO pin. The purpose of the game is to stack the tower as high as possible. A successful move is the one that stops the blinking LED at the same column as the previous moves.  Each click on the button will stop the moving light on the current row and, provided that the move is a successful one, the game will flash the next row of the LEDs and will continue. An unsuccessful move, on the other hand, will end the game with a special display of score and the words "GAME OVER". Given the limited height of the display, the screen will shift down after some successful moves so that the game can continue to run until an unsuccessful move is made. 
+
+\medskip
+
+The program of this game was written in the ARM assembly language. We have realised the importance of comments in assembly code, and thus we have extended our assembler program to support commenting with double slash. 
+
+\medskip
+
+In this program we have assigned a register to store the value of each pixel of the output display. For example, the bit number zero of the register would represent the display on the first pixel of the LED screen. When this bit is set to one, the first LED will be on and when set to zero the LED will be off. The same idea applies to the other bits in that register. We have also assigned some bits of the register to represent the number of the current row that the light is flashing. As a result of this, we are able to produce a flexible and well-structured display. 
+
+\medskip
+
+The main program consists of a while loop, running to check every bit in the display register that corresponds to an output LED. It would set or clear the display pixels accordingly. Before the end of the loop, once all 15 bits are checked, a smaller 'wait' loop will be entered. This 'wait' loop simply decrements a large number until it reaches zero, and by doing so, it pauses the display at the current state. This is necessary, as without it the light would flash too fast for the player to see or react. 
+
+\medskip
+
+To set the display of the moving light, we have assigned another register called the 'flash' register. This register stores a single bit 1 and the rest of the bits are 0.  At the end of the loop, the program will check which row is the current row then it would clear the display value of the whole row and add to the register the value in the flash register. After the flash register is added to the display register, it will be shifted. Whether it is shifted left or right depends on the value it is holding. This is to ensure that the flashing of the light does not go off the edge of the current row. 
+
+\medskip
+
+Within the 'wait' loop described above, the program would also constantly check for the input from the button. This is done by checking a specific bit in the GPLEV address of the Raspberry Pi. The current model of the game uses GPIO25 to detect the input signal.  Therefore we are checking for the bit number 25 in the address number 0x20200034. When the bit is one, meaning the button is pressed, the program will stop the moving light in the current row, analyse if the move is successful and decide what to display next. After a successful move, the flash register will be shifted to the left by three bits so that it flashes the next row. The fields in the display register that represent the current row of the game will also be updated. 
+
+\medskip
+
+The "GAME OVER" display is a moving display of each character entering from the bottom of the screen and exiting at the top. The motion of this display is done by left-shifting the display register by three, so the current display stays at the same column position but is moved up by one row. After the shifting, the bottom row of the screen is set by manually setting the bottom 3 bits of the display register to be the desired output. 
+
+\medskip
+
+\section{Testing}
+
+For our extension, we tested our implementations as it progressed and some special cases such as holding the button for longer than expected. Another case would be pressing the button quicker than the lights moving down the screen. We tried to consider all possible unexpected inputs but since our implementation only involves one button for the player to interact with, this was fairly straightforward.
+
+\medskip
+
+The testing at each stages were slow as we had to make sure the loop goes on until the player press the button and not stop after a certain period of time. We also had to make sure it does not affect other output pins. Each of us had a part of the extension we have to implement so we can only test our own implementations in turns. However, this was not much of an issue as we all worked at different speed and can test our own implementation without having the others to wait. One of the first test is to make sure our implementation works with our version of assembler and if extra instructions are needed, they are implemented and tested thoroughly. After testing it with our assembler, we moved on to our individual parts to test for the correct pattern of LEDs lighting.
+
+\medskip
+
+The method we went about testing our extension was done individually by parts and again together when we put them together. Testing it as our implementations progressed was definitely time consuming but effective as any problems that we encountered can be traced back to which part it is from and fixed before it causes more problems. 
+
+\section{Group reflection}
+
+We have meetings at least every other day and were communicating through our mobiles and social networks. We have previously worked together in topics so we have had experience in working with each other. For part 1, the emulator, we did not split the work in exact equal parts. This is because some parts such as data processing can be hard for two people to work at the same time since they will have to share some functions and can be implemented in different ways making it hard to put together. Instead, we used part 2, the assembler, as a balance so whoever had the most to do in part 1 had the least in part 2. We believe this is more straightforward and will have less bugs cause by linking our implementations. This also allowed us to program at our own pace. Programming in a group helped us see different methods of implementations as we share our ideas and discuss which the best way is considering timing and difficulty. 
+
+\medskip
+
+Some improvements that can be made next time would be to have a schedule ahead of time. Although we had deadlines that we set for ourselves, we could have a clearer schedule of which part is supposed to be done by when. This would help with our time management and improve the pace of our work.
+
+\section{Individual Reflection: Kam Chiu}
+
+I have worked with these group members before in topics as stated above and I think we all work together well. Communications with other group members and sharing our ideas were easy. I managed to meet the deadlines we set for ourselves and so did all the other members which helped with the pace of our project. I also helped with debugging our code and this has allowed me to learn and see different ways to solve a particular problem. This group project has definitely helped me improve my own style and approach to new problems in programming since programming is one of my weaker subjects. I think our group had split the work fairly equally with part one and two but I felt I could have done more in part three and the extension.
+
+\medskip
+
+We assigned a section for each of us whenever we start a part of the project (I did the multiply in emulator and data processing handler in assembler). I think this is better than dividing the whole project into 4 parts and assigning one part to each of us because certain parts could take longer than others and are more difficult than it first seemed. 
+Things I would have done differently would be to have a clearer schedule ahead of time but the amount and ease of communications between our group would be something to maintain when working in other groups in the future.
+
+\section{Individual Reflection: Ho Law}
+
+I feel that I worked well with the group, which is reflected by the mostly positive feedback we have had from WebPA. We have been able to communicate constantly and effectively through the Whatsapp group chat we had set up. It has been particularly useful for organizing meetings, and also acted as a good platform for discussion about our code. On average, we meet to work together in the labs 2-3 times a week, and I feel that this arrangement is suitable. I feel that the flexibility we have when arranging meetings is an advantage, because we can set up meetings whenever we finish our own parts. 
+
+\medskip
+
+For each part of the project, we have been able to work through some shared code together, and then divide the work for each group member. We share a preference to debug our code together, and different people can spot different mistakes and come up with different ideas to make our code better. I did make a lot of mistakes in my code when we first started building the emulator, and other group members helped me a lot to understand how to program in C. By the time we finished the assembler part, I was confident and able to debug code for other group members. As we progressed through the project, we became better at planning the structure of our code, such as clearly defining the types of arguments that we would pass around each function. This enabled us to work efficiently, knowing that other member’s code would satisfy the pre-conditions to our own parts, and when we put everything together, the general structure usually worked with only minor bugs.
+
+\section{Individual Reflection: Jiranart Vacheesuthum}
+
+Through WebPA feedback and experiences, I feel like I've given a decent amount of contribution to the work done throughout the project. My strong edge plays a part where I have to debug codes written by other members, as I am fairly confident with my pace in understanding codes and spotting the problems within. Yet, one of my weaknesses is my inactivity to suggest new designs or ideas towards both the basic implementation and the extension. What I could've done better was putting more effort into researching and studying the Raspberry Pi in more depths in order to be able to commit more ideas to the project.  There also has been a time where the part I've been assigned responsible for almost fell behind others' paces. Even though it did meet the deadlines we set, it was solely my neglect which stopped the work from proceeding faster. This, in particular, was rather different from what I thought it might be. As a fast worker, I usually am ahead of most of my classmates in general assignments, but it's been different this time. 
+
+\medskip
+
+To the extent of working with a different group of people, there are things I would maintain and a number of things I would better not. First of all, the responsibility I held for the group is something I would keep up to with any group or teammates I have to work with in the future. However, I've realised from that situation, where my work almost fell behind, was not to 'just meet the deadlines' but rather try to be dedicated with your own assigned tasks and drive the group work forward. 
+
+\section{Individual Reflection: Vasin Wongrassamee}
+
+I felt that I fitted well in this group. Other members listened to me when I tried to explain my ideas or thoughts. Many times when my explanations were bad, the group did not fail to be patient and try to understand. This was why the communication in the group was good even though I thought that it was one of my weaknesses.
+
+\medskip
+
+This group was also good at setting and dividing work for each member. Each member was able to work efficiently by himself and integrate his work with others afterwards. This was done successfully by respecting the deadline we set and having a good communication between members, which had resulted in good control over the pace of our work progress.
+
+\medskip
+
+By doing some research on Raspberry Pi, I was able to come up with the ideas for our extensions, one of which is the tower stacker. Through coding my individual part and debugging some code, I felt that I had made a good amount of contributions to the projects and so had the other members, undoubtedly. We fitted well as a group and I was very glad to be a part of it.
+
+
+\end{document}

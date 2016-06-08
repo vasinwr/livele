@@ -8,6 +8,7 @@ from django.contrib.auth.models import User, Group
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from django.db.models import Count
 #from .forms import PDFForm
 
 
@@ -27,11 +28,11 @@ def course_index(request, course):
         form = PDFForm(request.POST, request.FILES)
         if form.is_valid():
             pdf = form.save(commit=False)
-	    pdf.course = course_group
-	    pdf.lecturer = request.user
-	    pdf.save()
+            pdf.course = course_group
+            pdf.lecturer = request.user
+            pdf.save()
             # Redirect to the document list after POST
-	    return HttpResponseRedirect(course)
+            return HttpResponseRedirect(course)
     else:
         form = PDFForm()  # A empty, unbound form
 
@@ -61,7 +62,7 @@ def select(request, key):
         pass
 
     try:
-	curr_pdf = PDF.objects.get(pk = key)
+        curr_pdf = PDF.objects.get(pk = key)
         current = Current.objects.get(owner = request.user, pdf = curr_pdf)
         current.active = 1
         current.save()
@@ -80,11 +81,14 @@ def lecture(request):
     good = votes['good']
     bad = votes['bad']
     total = votes['total']
+
     if(request.user.groups.filter(name = 'Lecturer').count() == 1):
         return render(request, 'slides/lecture.html', {'pdffile': pdf.pdffile.url, 'pageCount':current.page, 'lecturer':True, 'votes_amplified':bad *100 / total, 'votes_rest': good*100/total})
     else:
-	question_form = QuestionForm()
-        return render(request, 'slides/lecture.html', {'pdffile': pdf.pdffile.url, 'pageCount':current.page, 'student':True, 'qform':question_form, 'votes_amplified':bad*100/total, 'votes_rest': good*100/ total})
+        question_form = QuestionForm()
+        curr_qs = Question.objects.filter(pdf = current.pdf, page = current.page)
+        displayQ = curr_qs.annotate(votes = Count('question_vote')).order_by('-votes')
+        return render(request, 'slides/lecture.html', {'pdffile': pdf.pdffile.url, 'pageCount':current.page, 'student':True, 'qform':question_form, 'questions': displayQ, 'votes_amplified':bad*100/total, 'votes_rest': good*100/ total})
 
 def get_votes(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
@@ -124,10 +128,10 @@ def next_page(request):
 def prev_page(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
     if (current.page > 1):
-	current.page -= 1
-	current.save()
-	if(request.user.groups.filter(name = 'Lecturer').count() == 1):
-	    current.pdf.current_page -= 1
+        current.page -= 1
+        current.save()
+        if(request.user.groups.filter(name = 'Lecturer').count() == 1):
+            current.pdf.current_page -= 1
             current.pdf.save()
     return HttpResponseRedirect(reverse('slides:lecture'))
 
@@ -175,13 +179,34 @@ def question(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
 
     if (current.pdf.current_page >= current.page):
-	dummy = Question(user = request.user, pdf = current.pdf, page = current.page, text = "")
-	dummy.save()
-	question = QuestionForm(request.POST, instance = dummy)
-	question.save()
+        dummy = Question(user = request.user, pdf = current.pdf, page = current.page, text = "")
+        dummy.save()
+        question = QuestionForm(request.POST, instance = dummy)
+        question.save()
     else:
-	pass
+        pass
     return HttpResponseRedirect(reverse('slides:lecture'))
+
+@login_required
+def qvote(request, question):
+    q = get_object_or_404(Question, pk = question)
+
+    try:
+        v = Question_Vote.objects.get(user = request.user, question = q)
+    except Question_Vote.DoesNotExist:
+        v = Question_Vote(user = request.user, question = q)
+        v.save()
+
+    return HttpResponseRedirect(reverse('slides:lecture'))
+
+@login_required
+def show_questions(request):
+    current = get_object_or_404(Current, owner = request.user, active=1)
+
+    curr_qs = Question.objects.filter(pdf = current.pdf)
+    displayQ = curr_qs.annotate(votes = Count('question_vote')).order_by('-votes')
+
+    return render(request, 'slides/questions.html', {'questions':displayQ})
 
 
 '''
