@@ -1,1 +1,0 @@
-"use strict";console.log("asdf"),Mousetrap.bind("7",function(){alert("7")});var app=angular.module("a",[]);
