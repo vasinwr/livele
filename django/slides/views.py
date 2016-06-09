@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render, redirect, render_to_response
 from django.template import RequestContext
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse;
 from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate, login
 from .models import Current, PDF, Votes, PDFForm, Question, QuestionForm, Question_Vote
@@ -10,9 +10,22 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.db.models import Count
 #from .forms import PDFForm
-
+import os
 
 # Create your views here.
+
+def pdf_view(request):
+    print (os.path.join(settings.MEDIA_ROOT, 'Backpropagation.pdf'))
+    with open(os.path.join(settings.MEDIA_ROOT,'slides.pdf') ,'rb') as pdf:
+        response = HttpResponse(pdf.read(), content_type='application/pdf')
+        response['Content-Disposition'] = 'inline;filename=some_file.pdf'
+        response['Access-Control-Allow-Headers'] = 'Range'
+        response['Access-Control-Expose-Headers'] = 'Accept-Ranges, Content-Encoding, Content-Length, Content-Range'
+        return response
+    pdf.closed
+
+def returnsomejson(request):
+  return JsonResponse({'x':'something'})
 
 @login_required
 def index(request):

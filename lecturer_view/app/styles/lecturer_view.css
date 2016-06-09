@@ -1,0 +1,213 @@
+html, body{
+  height: 100%;
+}
+
+#pdfviewer {
+  position: relative;
+  height:100%;
+  width:80%;
+  max-width:1200px;
+  box-shadow: 0px 0px 20px #eeeeee;
+}
+
+#bar {
+  position: absolute;
+  left: 20%;
+  top: 90%;
+  text-align: center;
+  width : 100%;
+}
+
+.center {
+    margin: auto;
+    width: 60px;
+    padding: 5px;
+    text-align: center;
+    color: #777777;
+    background-color: #FFC6C6;
+    box-shadow: 0px 0px 15px #dddddd;
+}
+
+.Bar-Container{
+  position: absolute;
+  width: 50%;
+  overflow: auto;
+  margin: auto;
+  top: 83%; left: 0; bottom: 0; right: 0;
+  text-align: center;
+}
+
+.Top-Half {
+  width: 100%;
+  height: 80%;
+}
+
+#prev {
+  position: relative;
+  top: 50%;
+  padding-left: 15%;
+  text-align: center;
+  color: #777;
+}
+.Left-Container {
+  float : left; 
+  width: 10%;
+  height: 100%;
+  min-width: 50px;
+  background-color: #EEE;
+}
+
+#next {
+  position: relative;
+  top: 50%;
+  padding-right: 15%;
+  text-align: center;
+  color: #777;
+}
+.Right-Container {
+  float : right; 
+  width: 10%;
+  height: 100%;
+  min-width: 50px;
+  background-color: #EEE;
+}
+
+.Side-Hover {
+  background-color: #ADDDFF;
+}
+
+#bottom {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+}
+
+.Background-Dark {
+  position: absolute;
+  top: 0px;
+  left:0px;
+  width: 100%;
+  height: 100%;
+  background-color: #f1f1f1;
+  opacity: 0.8;
+  z-index: 5;
+}
+
+.Foreground-White {
+  position: absolute;
+  width : 200px;
+  height: 200px;
+  background-color: white;
+  z-index : 10;
+}
+
+.red {
+  background-color: red;
+}
+
+#menu-popup-container {
+  position:absolute; width:100%; bottom:0px;
+  z-index:10;
+}
+
+#menu-popup-inner {
+    position: relative;
+    margin: auto;
+    width: 50%;
+    height: 600px;
+    text-align: center;
+    color: #777777;
+    background-color: white;
+    box-shadow: 0px 0px 15px #dddddd;
+}
+
+
+#menu-popup-close {
+  position:absolute; 
+  padding: 10px;
+  width:100%; height:60px; bottom:0px;
+  color: #FFB6B6;
+}
+.menu-close-hover {
+  color: #FF8282;
+}
+
+#menu-popup-navi-container {
+  position:relative; 
+  width:50%; float:left; 
+  padding:10px 5px 10px 10px;
+}
+#menu-popup-navi-inner{
+  background-color: #FCF8E3;
+  color: #EFE2A3;
+  padding: 10px;
+}
+.menu-navi-hover {
+  color:#E6BF03 !important;
+  background-color: #FFED8E !important; 
+}
+
+#menu-popup-home-container {
+  position:relative; 
+  width:50%; 
+  float:right;
+  padding: 10px 10px 10px 5px;
+}
+#menu-popup-home-inner{
+  padding:10px;
+  color: #97CFFF;
+  background-color: #D7EDFF;
+}
+.menu-home-hover{
+  color: #337AB7 !important;
+  background-color:#72BEFF !important;
+}
+
+#menu-popup-ques-container {
+position:relative; width:100%; height:40%; padding:0px 10px;
+}
+#menu-popup-ques-inner{
+  padding:10px;
+  height:100%;
+  color: #D28768;
+  background-color: #FFE1CB;
+}
+.menu-ques-hover{
+  color: #A54D29 !important;
+  background-color:#FFC398 !important;
+}
+
+#menu-popup-summ-container {
+position:relative; width:100%; height:30%; padding:10px;
+}
+#menu-popup-summ-inner{
+  padding:10px;
+  height:100%;
+  color: #7BA598;
+  background-color: #CFE4E0;
+}
+.menu-summ-hover{
+  color: #3B5A51 !important;
+  background-color:#9DE0D3 !important;
+}
+
+.bigger-font{
+  font-size:24px;
+}
+
+.normal-font{
+  font-size:18px;
+}
+
+
+#summary-container {
+  position: relative; top:0px; height:65%; width: 80%; margin:auto;
+}
+.summary-icon {
+  position: relative;
+  height: 100%;
+  width: 33%;
+  float: left;
+}
+
+

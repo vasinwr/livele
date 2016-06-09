@@ -6,6 +6,8 @@ from . import views
 
 app_name = 'slides'
 urlpatterns = [
+    url(r'^getpdf/', views.pdf_view),
+    url(r'^returnsomejson/', views.returnsomejson),
     url(r'^profile/', views.index),
     url(r'^login/', views.login),
     url(r'^logout/$', views.logout_view, name='logout'),
