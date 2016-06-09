@@ -16,7 +16,7 @@ import os
 
 def pdf_view(request):
     print (os.path.join(settings.MEDIA_ROOT, 'Backpropagation.pdf'))
-    with open(os.path.join(settings.MEDIA_ROOT,'slides.pdf') ,'rb') as pdf:
+    with open(os.path.join(settings.MEDIA_ROOT,'.pdf') ,'rb') as pdf:
         response = HttpResponse(pdf.read(), content_type='application/pdf')
         response['Content-Disposition'] = 'inline;filename=some_file.pdf'
         response['Access-Control-Allow-Headers'] = 'Range'
@@ -28,11 +28,11 @@ def returnsomejson(request):
   return JsonResponse({'x':'something'})
 
 @login_required
-def index(request):
+def course_list(request):
     user_courses = request.user.groups.exclude(name = 'Lecturer').exclude(name = 'Student').values_list('name', flat=True)
-    return render(request, 'slides/index.html', {'courses': user_courses})
+    return JsonResponse({'courses': user_courses})
 
-
+'''
 @login_required
 def course_index(request, course):
     course_group = Group.objects.get(name = course)
@@ -51,21 +51,31 @@ def course_index(request, course):
 
     # Load documents for the list page
     documents = PDF.objects.filter(course = course_group)
-    '''
+
     return render_to_response(
         'slides/course_index.html',
         {'documents': documents, 'form': form},
         context_instance=RequestContext(request)
     )
-    '''
+
     # Render list page with the documents and the form
     if(request.user.groups.filter(name = 'Lecturer').count() == 1):
         return render(request, 'slides/course_index.html', {'course': course, 'lecturer':True, 'documents': documents, 'form': form})
     else:
         return render(request, 'slides/course_index.html', {'course': course, 'documents': documents, 'form': form})
+'''
 
 @login_required
-def select(request, key):
+def lecture_list(request, course)
+# returns a list of lectures(pdfs) in the selected course
+    course_group = Group.objects.get(pk = course)
+    documents = PDF.objects.filter(course = course_group)
+    return JsonResponse({'docs':documents})
+
+@login_required
+def select_lecture(request, key):
+# selects PDF with the key and marks as the user's active
+# returns true after selected
 #deactive all other actives.
     try:
         other = Current.objects.get(owner = request.user, active=1)
@@ -75,7 +85,7 @@ def select(request, key):
         pass
 
     try:
-        curr_pdf = PDF.objects.get(pk = key)
+        curr_pdf = get_object_or_404(PDF, pk = key)
         current = Current.objects.get(owner = request.user, pdf = curr_pdf)
         current.active = 1
         current.save()
@@ -83,8 +93,9 @@ def select(request, key):
         current = Current(owner = request.user, pdf = curr_pdf, page=1, active=1)
         current.save()
 
-    return HttpResponseRedirect(reverse('slides:lecture'))
+    return JsonResponse({'ack':True})
 
+'''
 @login_required
 def lecture(request):
     current = get_object_or_404(Current, owner = request.user, active=1)
@@ -102,8 +113,49 @@ def lecture(request):
         curr_qs = Question.objects.filter(pdf = current.pdf, page = current.page)
         displayQ = curr_qs.annotate(votes = Count('question_vote')).order_by('-votes')
         return render(request, 'slides/lecture.html', {'pdffile': pdf.pdffile.url, 'pageCount':current.page, 'student':True, 'qform':question_form, 'questions': displayQ, 'votes_amplified':bad*100/total, 'votes_rest': good*100/ total})
+'''
 
-def get_votes(request):
+@login_required
+def get_pdf(request):
+    current = get_object_or_404(Current, owner = request.user, active=1)
+#    print (os.path.join(settings.MEDIA_ROOT, current.pdf.pdffile))
+    with open(os.path.join(settings.MEDIA_ROOT, current.pdf.pdffile) ,'rb') as pdf:
+        response = HttpResponse(pdf.read(), content_type='application/pdf')
+        response['Content-Disposition'] = 'inline;filename= current.pdf.filename '
+        response['Access-Control-Allow-Headers'] = 'Range'
+        response['Access-Control-Expose-Headers'] = 'Accept-Ranges, Content-Encoding, Content-Length, Content-Range'
+        return response
+    pdf.closed
+
+@login_required
+def get_page_questions(request):
+# returns list of questions on user's page on the pdf, can be used q.text, q.pk, q.vote
+    current = get_object_or_404(Current, owner = request.user, active=1)
+    curr_qs = Question.objects.filter(pdf = current.pdf, page = current.page)
+    displayQ = curr_qs.annotate(votes = Count('question_vote')).order_by('-votes')
+    return JsonResponse({'questions': displayQ})
+
+
+@login_required
+def get_qform(request):
+# returns a blank question form if the user can vote
+# returns false otherwise
+    if (current.pdf.current_page >= current.page):
+        current = get_object_or_404(Current, owner = request.user, active=1)
+        question_form = QuestionForm()
+        return JsonResponse({'qform':question_form})
+    else
+        return JsonResponse({'qform':False})
+
+@login_required
+def get_curr_page(request):
+# returns current page number for the user
+    current = get_object_or_404(Current, owner = request.user, active=1)
+    return JsonResponse({'page':current.page})
+
+@login_required
+def get_mood(request):
+# return mood status as percentages
     current = get_object_or_404(Current, owner = request.user, active=1)
     curr_pdf = current.pdf
 
@@ -122,23 +174,25 @@ def get_votes(request):
         total = 1
         good = 1
     
-    return {'good': good, 'bad':bad, 'total':total}
+    return JsonResponse({'good': good*100/total, 'bad': bad*100/total})
 
 
 @login_required
-def next_page(request):
+def go_next_page(request):
+# user moves to page+1. need to check if this is valid before calling. use pdf.js checkmax in frontend.
+# returns updated page number
     current = get_object_or_404(Current, owner = request.user, active=1)
-# felix is there a check in pdf to check if page > last page?
-#    if (current.page +1 <= current.pdf.**lastpage**)
     current.page +=1
     current.save()
     if(request.user.groups.filter(name = 'Lecturer').count() == 1):
-        current.pdf.current_page += 1
+        current.pdf.current_page = current.page
         current.pdf.save()
-    return HttpResponseRedirect(reverse('slides:lecture'))
+    return JsonResponse({'page':current.page})
 
 @login_required
-def prev_page(request):
+def go_prev_page(request):
+# user moves to page-1. 
+# returns updated page number
     current = get_object_or_404(Current, owner = request.user, active=1)
     if (current.page > 1):
         current.page -= 1
@@ -146,17 +200,21 @@ def prev_page(request):
         if(request.user.groups.filter(name = 'Lecturer').count() == 1):
             current.pdf.current_page -= 1
             current.pdf.save()
-    return HttpResponseRedirect(reverse('slides:lecture'))
+    return JsonResponse({'page':current.page})
 
 @login_required
-def curr_page(request):
+def go_curr_page(request):
+# user jumps to lecturer's current page. 
+# returns updated page number
     mycurr = get_object_or_404(Current, owner = request.user, active=1)
     mycurr.page = mycurr.pdf.current_page
     mycurr.save()
-    return HttpResponseRedirect(reverse('slides:lecture'))
+    return JsonResponse({'page':mycurr.page})
 
 @login_required
 def vote_up(request):
+# user votes up on his current slide. 
+# returns true if voted, false otherwise.
     current = get_object_or_404(Current, owner = request.user, active=1)
 
     if (current.pdf.current_page >= current.page):
@@ -167,12 +225,15 @@ def vote_up(request):
             v = Votes(user = request.user, pdf = current.pdf, page = current.page, value = 0)
         v.save()
         v.send_notification(get_votes(request))
+        return JsonResponse({'ack':True})
     else:
         pass
-    return HttpResponseRedirect(reverse('slides:lecture'))
+    return JsonResponse({'ack':False})
 
 @login_required
 def vote_down(request):
+# user votes down on his current slide. 
+# returns true if voted, false otherwise.
     current = get_object_or_404(Current, owner = request.user, active=1)
 
     if (current.pdf.current_page >= current.page):
@@ -183,12 +244,15 @@ def vote_down(request):
             v = Votes(user = request.user, pdf = current.pdf, page = current.page, value = 1)
         v.save()
         v.send_notification(get_votes(request))
+        return JsonResponse({'ack':True})
     else:
         pass    
-    return HttpResponseRedirect(reverse('slides:lecture'))
+    return JsonResponse({'ack':False})
 
 @login_required
 def question(request):
+# user asks a question on his current slide. 
+# returns true if question asked, false otherwise.
     current = get_object_or_404(Current, owner = request.user, active=1)
 
     if (current.pdf.current_page >= current.page):
@@ -196,12 +260,15 @@ def question(request):
         dummy.save()
         question = QuestionForm(request.POST, instance = dummy)
         question.save()
+        return JsonResponse({'ack':True})
     else:
         pass
-    return HttpResponseRedirect(reverse('slides:lecture'))
+    return JsonResponse({'ack':False})
 
 @login_required
 def qvote(request, question):
+# user votes up the question with given private key.
+# returns an ack for checking.
     q = get_object_or_404(Question, pk = question)
 
     try:
@@ -210,16 +277,18 @@ def qvote(request, question):
         v = Question_Vote(user = request.user, question = q)
         v.save()
 
-    return HttpResponseRedirect(reverse('slides:lecture'))
+    return JsonResponse({'ack':question})
 
 @login_required
 def show_questions(request):
+# for lecturer to see all questions asked on his current lecture, from all pages.
+# returns a list of questions that can be used -- q.text , q.page, q.vote etc
     current = get_object_or_404(Current, owner = request.user, active=1)
 
     curr_qs = Question.objects.filter(pdf = current.pdf)
     displayQ = curr_qs.annotate(votes = Count('question_vote')).order_by('-votes')
 
-    return render(request, 'slides/questions.html', {'questions':displayQ})
+    return JsonResponse({'questions':displayQ})
 
 
 '''
