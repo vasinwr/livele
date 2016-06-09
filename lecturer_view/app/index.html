@@ -27,20 +27,21 @@
 <!-- ------------------------------------------------------------------------- -->
   <body>
     <section ng-controller="MainmenuController as mmCtrl">
-      <div class="Background-White" ng-hide="mmCtrl.SharedData.mainmenuHide">
+      <div class="Background-White" ng-hide="mmCtrl.SharedData.mainmenuHide"
+                                    ng-init="mmCtrl.getleclist">
         <div class="sticky_menu">
 	  <a href='#' class="lead"  ng-click="mmCtrl.SharedData.mainmenuHide = true">Slide app</a>
 	</div>
 
 	<div class="content container row-centered" style="padding-top:50px;">
-          <div class="mainmenu_icon col-md-4" ng-repeat="each in mmCtrl.xs"
+          <div class="mainmenu_icon col-md-4" ng-repeat="each in mmCtrl.xs track by each.pk"
                                               ng-class="{grey: mmCtrl.icon_hover}"
-                                              >
+                                              ng-click="mmCtrl.getlecture(each.pk);mmCtrl.SharedData.mainmenuHide = true; mmCtrl.getpdf()">
 	    <div class='inner_image'> 
 	      <img class="icon_image" src='https://i.ytimg.com/vi/tntOCGkgt98/maxresdefault.jpg'> 
 	    </div> 
 	    <div class='headline'> 
-              title
+              {{each.filename}}
 	    </div> 
             <div style="float: left; background-color: red;"> info </div>
             <div style="float: left; background-color: blue;"> start </div>
@@ -53,7 +54,7 @@
 	      <img class="icon_image" src=''> 
 	    </div> 
 	    <div class='headline'> 
-              upload new slides
+              upload new slides {{mmCtrl.docs }}
 	    </div> 
             <div> 
 	  </div>

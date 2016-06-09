@@ -34,18 +34,42 @@ app.controller('SidesController', function(){
 app.controller('MainmenuController', ['$http', 'SharedData', function($http, SharedData){
   this.SharedData = SharedData;
   this.hide = false; 
-  this.xs = [1,2,3,4,5];
+  this.docs = {};
+  this.xs = this.docs; //this.xs = lecutre_list().docs;
+//this.xs = [{'pk': 6, 'filename': 'CH1'}, {'pk': 7, 'filename': 'BP'}]
   this.icon_hover = false;
 
   var ctrl = this;
   this.json = {'x':'nothing'};
 
-  this.getjson = function(){
+  this.getlecture = function(key){
+    console.log(key);
+    console.log("blah")
+    $http.get('http://127.0.0.1:8000/slides/select_lecture/'+key).success(function(data){
+    //ctrl.json = data;
+    });
+    $http.get('http://127.0.0.1:8000/slides/get_pdf/').success(function(data){
+    //ctrl.json = data;
+    });
+  };
+  this.getjsond = function(){
     $http.get('http://127.0.0.1:8000/slides/returnsomejson').success(function(data){
       ctrl.json = data;
     });
   };
-}]);
+  this.getjson = function(){
+    console.log("a");
+    $http.get('http://127.0.0.1:8000/slides/lecture_list/a').success(function(data){
+     //console.log(ctrl.xs == eval(JSON.parse(data)));
+     ctrl.xs = eval(JSON.parse(data));
+     ctrl.docs = ctrl.xs;
+    });
+   };
+  this.getpdf = function(){
+    console.log("getpdf");
+    getPDF();
+  }
+  }]);
 
 
 
@@ -61,7 +85,7 @@ app.directive('menuList', function(){
 
 
 
-var url ="http://127.0.0.1:8000/slides/getpdf";
+var url ='http://127.0.0.1:8000/slides/get_pdf';
 //window.open(url);
 console.log(url);
 var maxPages = 0;
@@ -70,7 +94,7 @@ var canvas = document.getElementById('pdfviewer');
 var context = canvas.getContext('2d');
 var viewport = 0;
 var renderContext = 0;
-getPDF();
+//getPDF();
 function getPDF() {
   PDFJS.disableWorker = true;
 //  PDFJS.workerSrc = "scripts/pdf.worker.js";

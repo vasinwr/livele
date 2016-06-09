@@ -8,10 +8,10 @@ app_name = 'slides'
 urlpatterns = [
     url(r'^getpdf/', views.pdf_view),
     url(r'^returnsomejson/', views.returnsomejson),
-    url(r'^profile/', views.index),
+#    url(r'^profile/', views.index),
     url(r'^login/', views.login),
     url(r'^logout/$', views.logout_view, name='logout'),
-    url(r'^$', views.index, name='index'),
+#    url(r'^$', views.index, name='index'),
     url(r'^course_list/', views.course_list, name='course list'),
     url(r'^select_lecture/([a-zA-Z0-9_]+)', views.select_lecture, name='select lecture'),
     url(r'^lecture_list/([a-zA-Z0-9_]+)', views.lecture_list, name='lecture list'),

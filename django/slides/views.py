@@ -11,12 +11,14 @@ from django.contrib.auth import logout
 from django.db.models import Count
 #from .forms import PDFForm
 import os
+import json
+from django.core import serializers 
 
 # Create your views here.
 
 def pdf_view(request):
     print (os.path.join(settings.MEDIA_ROOT, 'Backpropagation.pdf'))
-    with open(os.path.join(settings.MEDIA_ROOT,'.pdf') ,'rb') as pdf:
+    with open(os.path.join(settings.MEDIA_ROOT,'slides.pdf') ,'rb') as pdf:
         response = HttpResponse(pdf.read(), content_type='application/pdf')
         response['Content-Disposition'] = 'inline;filename=some_file.pdf'
         response['Access-Control-Allow-Headers'] = 'Range'
@@ -65,12 +67,13 @@ def course_index(request, course):
         return render(request, 'slides/course_index.html', {'course': course, 'documents': documents, 'form': form})
 '''
 
-@login_required
-def lecture_list(request, course)
+
+def lecture_list(request, course):
 # returns a list of lectures(pdfs) in the selected course
-    course_group = Group.objects.get(pk = course)
-    documents = PDF.objects.filter(course = course_group)
-    return JsonResponse({'docs':documents})
+#    course_group = Group.objects.get(pk = course)
+#    documents = PDF.objects.filter(course = course_group)
+    documents = str(PDF.objects.values('pk', 'filename'))
+    return JsonResponse(documents, safe=False)
 
 @login_required
 def select_lecture(request, key):
@@ -115,11 +118,12 @@ def lecture(request):
         return render(request, 'slides/lecture.html', {'pdffile': pdf.pdffile.url, 'pageCount':current.page, 'student':True, 'qform':question_form, 'questions': displayQ, 'votes_amplified':bad*100/total, 'votes_rest': good*100/ total})
 '''
 
-@login_required
 def get_pdf(request):
-    current = get_object_or_404(Current, owner = request.user, active=1)
+#    current = get_object_or_404(Current, owner = request.user, active=1)
+    user = User.objects.get(username = 'lecturer1')
+    current = Current.objects.get(owner = user, active = 1)
 #    print (os.path.join(settings.MEDIA_ROOT, current.pdf.pdffile))
-    with open(os.path.join(settings.MEDIA_ROOT, current.pdf.pdffile) ,'rb') as pdf:
+    with open(os.path.join(settings.MEDIA_ROOT, str(current.pdf.pdffile)) ,'rb') as pdf:
         response = HttpResponse(pdf.read(), content_type='application/pdf')
         response['Content-Disposition'] = 'inline;filename= current.pdf.filename '
         response['Access-Control-Allow-Headers'] = 'Range'
@@ -144,7 +148,7 @@ def get_qform(request):
         current = get_object_or_404(Current, owner = request.user, active=1)
         question_form = QuestionForm()
         return JsonResponse({'qform':question_form})
-    else
+    else:
         return JsonResponse({'qform':False})
 
 @login_required
