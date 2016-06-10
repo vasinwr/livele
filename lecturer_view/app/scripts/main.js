@@ -52,12 +52,12 @@ app.controller('MainmenuController', ['$http', 'SharedData', function($http, Sha
     //ctrl.json = data;
     });
   };
-  this.getjsond = function(){
+  this.getjson = function(){
     $http.get('http://127.0.0.1:8000/slides/returnsomejson').success(function(data){
       ctrl.json = data;
     });
   };
-  this.getjson = function(){
+  this.getleclist = function(name){
     console.log("a");
     $http.get('http://127.0.0.1:8000/slides/lecture_list/a').success(function(data){
      //console.log(ctrl.xs == eval(JSON.parse(data)));

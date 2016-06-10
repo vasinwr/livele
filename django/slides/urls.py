@@ -6,6 +6,10 @@ from . import views
 
 app_name = 'slides'
 urlpatterns = [
+    url(r'^api/register/$', views.register),
+    url(r'^api/login/$', views.login),
+    url(r'^api/logout/$', views.logout),
+    
     url(r'^getpdf/', views.pdf_view),
     url(r'^returnsomejson/', views.returnsomejson),
 #    url(r'^profile/', views.index),

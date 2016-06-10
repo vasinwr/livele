@@ -14,6 +14,11 @@ import os
 import json
 from django.core import serializers 
 
+from .utils import json_response, token_required
+from django.views.decorators.csrf import csrf_exempt
+from django.db import IntegrityError
+from .models import Token
+
 # Create your views here.
 
 def pdf_view(request):
@@ -26,7 +31,9 @@ def pdf_view(request):
         return response
     pdf.closed
 
+@login_required
 def returnsomejson(request):
+  Votes.send_notif()
   return JsonResponse({'x':'something'})
 
 @login_required
@@ -300,11 +307,91 @@ def show_questions(request):
 def home(request):
     return HttpResponseRedirect(reverse('slides:index', args=[request.user.username]))
 '''
+'''
 def login(request):
     return HttpResponseRedirect('/login/')
-
+'''
 @login_required
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect('/login/')
 
+
+@csrf_exempt
+def register(request):
+    if request.method == 'POST':
+        username = request.POST.get('username', None)
+        password = request.POST.get('password', None)
+
+        if username is not None and password is not None:
+            try:
+                user = User.objects.create_user(username, None, password)
+            except IntegrityError:
+                return json_response({
+                    'error': 'User already exists'
+                }, status=400)
+            token = Token.objects.create(user=user)
+            return json_response({
+                'token': token.token,
+                'username': user.username
+            })
+        else:
+            return json_response({
+                'error': 'Invalid Data'
+            }, status=400)
+    elif request.method == 'OPTIONS':
+        return json_response({})
+    else:
+        return json_response({
+            'error': 'Invalid Method'
+        }, status=405)
+
+@csrf_exempt
+def login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username', None)
+        password = request.POST.get('password', None)
+
+        if username is not None and password is not None:
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                if user.is_active:
+                    token, created = Token.objects.get_or_create(user=user)
+                    return json_response({
+                        'token': token.token,
+                        'username': user.username
+                    })
+                else:
+                    return json_response({
+                        'error': 'Invalid User'
+                    }, status=400)
+            else:
+                return json_response({
+                    'error': 'Invalid Username/Password'
+                }, status=400)
+        else:
+            return json_response({
+                'error': 'Invalid Data'
+            }, status=400)
+    elif request.method == 'OPTIONS':
+        return json_response({})
+    else:
+        return json_response({
+            'error': 'Invalid Method'
+        }, status=405)
+
+
+@csrf_exempt
+@token_required
+def logout(request):
+    if request.method == 'POST':
+        request.token.delete()
+        return json_response({
+            'status': 'success'
+        })
+    elif request.method == 'OPTIONS':
+        return json_response({})
+    else:
+        return json_response({
+            'error': 'Invalid Method'
+        }, status=405)

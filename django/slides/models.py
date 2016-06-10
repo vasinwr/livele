@@ -6,7 +6,28 @@ from django.shortcuts import get_object_or_404
 import os
 from django.forms import ModelForm
 
+import binascii
+
 # Create your models here.
+
+class Token(models.Model):
+    user = models.ForeignKey(User)
+    token = models.CharField(max_length=40, primary_key=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = self.generate_token()
+        return super(Token, self).save(*args, **kwargs)
+
+    def generate_token(self):
+        return binascii.hexlify(os.urandom(20)).decode()
+
+    def __unicode__(self):
+        return self.token
+
+
+###############
 
 def rename(instance, filename):
     return '/'.join([filename])
@@ -52,6 +73,16 @@ class Votes(models.Model):
 
     def __str__(self):
         return str(self.user) +' '+ str(self.pdf) +' page'+ str(self.page)  + (' happy' if (self.value == 0) else ' unhappy')
+
+    def send_notif():
+        notification = {
+            "green_bar": 100,
+            "red_bar": 0,
+        }
+        Channel_Group("all").send({
+            "text": json.dumps(notification),
+        })
+
 
     def send_notification(self, votes):
         good = votes['good'] * 100 / votes['total']

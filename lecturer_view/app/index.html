@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="" ng-app="lecture">
+<html lang="" ng-app="frontendApp">
   <head>
     <meta charset="utf-8">
     <meta name="description" content="">
@@ -26,151 +26,24 @@
   </head>
 <!-- ------------------------------------------------------------------------- -->
   <body>
-    <section ng-controller="MainmenuController as mmCtrl">
-      <div class="Background-White" ng-hide="mmCtrl.SharedData.mainmenuHide"
-                                    ng-init="mmCtrl.getleclist">
-        <div class="sticky_menu">
-	  <a href='#' class="lead"  ng-click="mmCtrl.SharedData.mainmenuHide = true">Slide app</a>
-	</div>
+    <div id="main">
+      <div ng-view></div>
+    </div>
+    <!--section ng-controller="AuthCtrl">
 
-	<div class="content container row-centered" style="padding-top:50px;">
-          <div class="mainmenu_icon col-md-4" ng-repeat="each in mmCtrl.xs track by each.pk"
-                                              ng-class="{grey: mmCtrl.icon_hover}"
-                                              ng-click="mmCtrl.getlecture(each.pk);mmCtrl.SharedData.mainmenuHide = true; mmCtrl.getpdf()">
-	    <div class='inner_image'> 
-	      <img class="icon_image" src='https://i.ytimg.com/vi/tntOCGkgt98/maxresdefault.jpg'> 
-	    </div> 
-	    <div class='headline'> 
-              {{each.filename}}
-	    </div> 
-            <div style="float: left; background-color: red;"> info </div>
-            <div style="float: left; background-color: blue;"> start </div>
-            <div style="float: left; background-color: green;"> delete </div>
-            <div> 
-	  </div> 
-        </div>
-          <div class="mainmenu_icon col-md-4"ng-class="{grey: mmCtrl.icon_hover}">
-	    <div class='inner_image'> 
-	      <img class="icon_image" src=''> 
-	    </div> 
-	    <div class='headline'> 
-              upload new slides {{mmCtrl.docs }}
-	    </div> 
-            <div> 
-	  </div>
-      </div>
-      <a href="http://127.0.0.1:8000/slides/login"> gogogo </a>
-      <a href="http://www.google.com"> gogogo </a>
-      <div ng-click="mmCtrl.getjson()" class="red"> getjson </div>
-      {{ mmCtrl.json }}
+
+    <h1>Register here!</h1>
+<p class="text-danger" ng-show="registerError">{{ registerError }}</p>
+<form ng-submit="register()">
+  <input type="text" class="form-control" ng-model="registerUsername" placeholder="Username">
+  <input type="password" class="form-control" ng-model="registerPassword" placeholder="Password">
+  <input type="submit" class="btn btn-default" value="Submit">
+</form>
     </section>
-
-
-
-
-    <!--//////////////////////////////////////////////////////////////////////////////////////////////-->
-
-
-
-    <!-- Top half -->
-    <div id="top-half" class="Top-Half" ng-controller="SidesController as sides">
-    
-      <div class="Left-Container" ng-class="{'Side-Hover' : sides.left_hover}" 
-                                  ng-mouseover="sides.left_hover = true"
-                                  ng-mouseleave="sides.left_hover = false">
-        <div id="prev"><i class="fa fa-angle-left fa-2x" aria-hidden="true"></i></div>
-      </div>
-      <canvas id="pdfviewer"></canvas>
-      <div class="Right-Container" ng-class="{'Side-Hover' : sides.right_hover}" 
-                                  ng-mouseover="sides.right_hover = true"
-                                  ng-mouseleave="sides.right_hover = false">
-        <div id="next"><i class="fa fa-angle-right fa-2x" aria-hidden="true"></i></div>
-      </div>
-
-    </div>
-
-    <!-- Bar container -->
-    <div class="container Bar-Container">
-      <p class="lead">Current class status</p>
-      <div class="progress progress">
-          <div id="red_bar" class="progress-bar progress-bar-danger" style="width: 80%"></div>
-          <div class="progress-bar progress-bar-warning" style="width: 0%"></div>
-          <div id="green_bar" class="progress-bar progress-bar-success" style="width: 20%"></div>
-      </div>
-    </div>
-
-    <!-- Menu Bar -->
-    <section ng-controller="MenuController as menuCtrl">
-    <div id="bottom" >
-      <div class="center" ng-mouseover="menuCtrl.hover = true" ng-mouseleave="menuCtrl.hover = false" ng-click="menuCtrl.clicked=true">
-
-        <i class="fa fa-sort-asc" aria-hidden="true" style="height:10px;"></i>
-        <p ng-show="menuCtrl.hover">menu </p>
-      </div>
-      <!--menu-list></menu-list-->
-    </div>
-
-    <div id="menu-popup-container" ng-show="menuCtrl.clicked">
-      <div id="menu-popup-inner"> 
-        <div id="menu-popup-summ-container" ng-mouseover="menuCtrl.summ_hover=true"
-                                            ng-mouseleave="menuCtrl.summ_hover=false">
-          <div id="menu-popup-summ-inner" ng-class="{'menu-summ-hover': !menuCtrl.summ_hover}">
-            <p class="lead bigger-font"><u>summary</u></p>
-            <div id="summary-container"> 
-              <div class="summary-icon">
-                <i class="fa fa-diamond" style="font-size: 40px" aria-hidden="true"></i>
-                <p> super x14 </p>
-              </div> 
-              <div class="summary-icon">
-                <i class="fa fa-flash" style="font-size: 40px"aria-hidden="true"></i>
-                <p> too fast x5 </p>
-              </div> 
-              <div class="summary-icon">
-                <i class="fa fa-deaf" style="font-size: 40px"aria-hidden="true"></i>
-                <p> i'm lost x2 </p>
-              </div> 
-            </div>
-          </div>
-        </div>
-        <div id="menu-popup-ques-container" ng-mouseover="menuCtrl.ques_hover=true"
-                                          ng-mouseleave="menuCtrl.ques_hover=false">
-          <div id="menu-popup-ques-inner" ng-class="{'menu-ques-hover': !menuCtrl.ques_hover}">
-            <p class="lead bigger-font"><u>questions</u></p>
-            <p class="lead normal-font">{{ menuCtrl.ques[0].question }} - {{ menuCtrl.ques[0].votes }} <i class="fa fa-thumbs-up" aria-hidden="true"></i> </p>
-            <p class="lead normal-font">{{ menuCtrl.ques[1].question }} - {{ menuCtrl.ques[1].votes}} <i class="fa fa-thumbs-up" aria-hidden="true"></i> </p>
-            <p class="lead normal-font">{{ menuCtrl.ques[2].question }} - {{ menuCtrl.ques[2].votes}} <i class="fa fa-thumbs-up" aria-hidden="true"></i> </p>
-            <p class="lead normal-font"> ... </p>
-          </div>
-        </div>
-        <div id="menu-popup-navi-container" ng-mouseover="menuCtrl.navi_hover=true"
-                                            ng-mouseleave="menuCtrl.navi_hover=false">
-          <div id="menu-popup-navi-inner" ng-class="{'menu-navi-hover': !menuCtrl.navi_hover}">
-          <p class="lead"><br /> <i class="fa fa-compass fa-2x" aria-hidden="true"></i> </p>
-          </div>
-        </div>
-        <div id="menu-popup-home-container" ng-mouseover="menuCtrl.home_hover=true"
-                                            ng-mouseleave="menuCtrl.home_hover=false">
-          <div id="menu-popup-home-inner" ng-class="{'menu-home-hover': !menuCtrl.home_hover}" 
-                                          ng-click="menuCtrl.SharedData.mainmenuHide = false; menuCtrl.clicked = false" >
-          <p class="lead"><br /> <i class="fa fa-home fa-2x" aria-hidden="true"></i> </p>
-          </div>
-        </div>
-        <div id="menu-popup-close">
-          <i class="fa fa-times-circle fa-3x" ng-class="{'menu-close-hover': !menuCtrl.close_hover}" 
-                                              ng-mouseover="menuCtrl.close_hover = true"
-                                              ng-mouseleave="menuCtrl.close_hover = false"
-                                              ng-click="menuCtrl.clicked = false" 
-                                              aria-hidden="true"></i>
-        </div>
-
-      </div>
-    </div>
-    <div class="Background-Dark" ng-show="menuCtrl.clicked"></div>
-    </section>
-
-    
-
-
+    <section ng-controller="DashboardCtrl"
+<h1>Username: {{ username }}</h1>
+<h1>Token: {{ token }}</h1>
+    </section-->
 
 
 <!-- ------------------------------------------------------------------------- -->
@@ -206,12 +79,23 @@
     <script src="/bower_components/bootstrap/js/scrollspy.js"></script>
     <script src="/bower_components/bootstrap/js/collapse.js"></script>
     <script src="/bower_components/bootstrap/js/tab.js"></script>
+
+        <script src="/bower_components/angular-cookies/angular-cookies.js"></script>
+        <script src="/bower_components/angular-resource/angular-resource.js"></script>
+        <script src="/bower_components/angular-sanitize/angular-sanitize.js"></script>
+        <script src="/bower_components/angular-route/angular-route.js"></script>
+
     <!-- endbuild -->
     
     <!-- build:js scripts/main.js -->
-    <script src="scripts/websocket.js"></script>
-    <script src="scripts/mousetrap.js"></script>
-    <script src="scripts/main.js"></script>
+
+
+        <script src="scripts/app.js"></script>
+        <script src="scripts/controllers/auth.js"></script>
+        <script src="scripts/controllers/dashboard.js"></script>
+        <script src="scripts/services/auth.js"></script>
+        <script src="scripts/interceptors/auth.js"></script>
+
     <!-- endbuild -->
   </body>
 </html>
