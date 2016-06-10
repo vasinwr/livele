@@ -12,9 +12,14 @@ app.config(['$routeProvider','$httpProvider', function($routeProvider, $httpProv
       templateUrl: 'views/auth.html',
       controller: 'AuthCtrl'
     })
-    .when('/dashboard', {
-      templateUrl: 'views/dashboard.html',
-      controller: 'DashboardCtrl'
+    .when('/mainmenu', {
+      templateUrl: 'views/mainmenu.html',
+      controller: 'MainmenuCtrl'
+
+    })
+    .when('/lecture', {
+      templateUrl: 'views/lecture.html',
+      controller: 'LectureCtrl'
     })
     .otherwise({
       redirectTo: '/'

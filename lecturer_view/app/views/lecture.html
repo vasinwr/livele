@@ -1,0 +1,127 @@
+    <!-- Top half -->
+    <div id="top-half" class="Top-Half">
+    
+      <div class="Left-Container" ng-class="{'Side-Hover' : left_hover}" 
+                                  ng-mouseover="left_hover = true"
+                                  ng-mouseleave="left_hover = false">
+        <div id="prev"><i class="fa fa-angle-left fa-2x" aria-hidden="true"></i></div>
+      </div>
+      <canvas id="pdfviewer"></canvas>
+      <div class="Right-Container" ng-class="{'Side-Hover' : right_hover}" 
+                                  ng-mouseover="right_hover = true"
+                                  ng-mouseleave="right_hover = false">
+        <div id="next"><i class="fa fa-angle-right fa-2x" aria-hidden="true"></i></div>
+      </div>
+
+    </div>
+
+    <!-- Bar container -->
+    <div class="container Bar-Container">
+      <p class="lead">Current class status</p>
+      <div class="progress progress">
+          <div id="red_bar" class="progress-bar progress-bar-danger" style="width: 80%"></div>
+          <div class="progress-bar progress-bar-warning" style="width: 0%"></div>
+          <div id="green_bar" class="progress-bar progress-bar-success" style="width: 20%"></div>
+      </div>
+    </div>
+    <!-- Menu Bar -->
+    <section >
+    <div id="bottom" >
+      <div class="center" ng-mouseover="hover = true" ng-mouseleave="hover = false" ng-click="clicked=true">
+
+        <i class="fa fa-sort-asc" aria-hidden="true" style="height:10px;"></i>
+        <p ng-show="hover">menu </p>
+      </div>
+      <!--menu-list></menu-list-->
+    </div>
+    <div id="menu-popup-container" ng-show="clicked">
+      <div id="menu-popup-inner"> 
+        <div id="menu-popup-summ-container" ng-mouseover="summ_hover=true"
+                                            ng-mouseleave="summ_hover=false">
+          <div id="menu-popup-summ-inner" ng-class="{'menu-summ-hover': !summ_hover}">
+            <p class="lead bigger-font"><u>summary</u></p>
+            <div id="summary-container"> 
+              <div class="summary-icon">
+                <i class="fa fa-diamond" style="font-size: 40px" aria-hidden="true"></i>
+                <p> super x14 </p>
+              </div> 
+              <div class="summary-icon">
+                <i class="fa fa-flash" style="font-size: 40px"aria-hidden="true"></i>
+                <p> too fast x5 </p>
+              </div> 
+              <div class="summary-icon">
+                <i class="fa fa-deaf" style="font-size: 40px"aria-hidden="true"></i>
+                <p> i'm lost x2 </p>
+              </div> 
+            </div>
+          </div>
+        </div>
+        <div id="menu-popup-ques-container" ng-mouseover="ques_hover=true"
+                                          ng-mouseleave="ques_hover=false">
+          <div id="menu-popup-ques-inner" ng-class="{'menu-ques-hover': !ques_hover}">
+            <p class="lead bigger-font"><u>questions</u></p>
+            <p class="lead normal-font">{{ ques[0].question }} - {{ ques[0].votes }} <i class="fa fa-thumbs-up" aria-hidden="true"></i> </p>
+            <p class="lead normal-font">{{ ques[1].question }} - {{ ques[1].votes}} <i class="fa fa-thumbs-up" aria-hidden="true"></i> </p>
+            <p class="lead normal-font">{{ ques[2].question }} - {{ ques[2].votes}} <i class="fa fa-thumbs-up" aria-hidden="true"></i> </p>
+            <p class="lead normal-font"> ... </p>
+          </div>
+        </div>
+        <div id="menu-popup-navi-container" ng-mouseover="navi_hover=true"
+                                            ng-mouseleave="navi_hover=false">
+          <div id="menu-popup-navi-inner" ng-class="{'menu-navi-hover': !navi_hover}">
+          <p class="lead"><br /> <i class="fa fa-compass fa-2x" aria-hidden="true"></i> </p>
+          </div>
+        </div>
+        <div id="menu-popup-home-container" ng-mouseover="home_hover=true"
+                                            ng-mouseleave="home_hover=false">
+          <div id="menu-popup-home-inner" ng-class="{'menu-home-hover': !home_hover}" 
+                                          ng-click="clicked = false; backhome()" >
+          <p class="lead"><br /> <i class="fa fa-home fa-2x" aria-hidden="true"></i> </p>
+          </div>
+        </div>
+        <div id="menu-popup-close">
+          <i class="fa fa-times-circle fa-3x" ng-class="{'menu-close-hover': !close_hover}" 
+                                              ng-mouseover="close_hover = true"
+                                              ng-mouseleave="close_hover = false"
+                                              ng-click="clicked = false" 
+                                              aria-hidden="true"></i>
+        </div>
+
+      </div>
+    </div>
+    <div class="Background-Dark" ng-show="clicked"></div>
+
+    <script>
+    var url ='http://127.0.0.1:8000/slides/get_pdf';
+    //window.open(url);
+    console.log(url);
+    var maxPages = 0;
+    var scale = 1.5;
+    var canvas = document.getElementById('pdfviewer');
+    var context = canvas.getContext('2d');
+    var viewport = 0;
+    var renderContext = 0;
+    var page_no = 1;
+    getPDF();
+    function getPDF() {
+      PDFJS.disableWorker = true;
+    //  PDFJS.workerSrc = "scripts/pdf.worker.js";
+      PDFJS.getDocument(url).then(function getPdfViewer(pdf) {
+        // Fetch the first page
+        maxPages = pdf.numPages;
+        pdf.getPage(page_no).then(function getPageViewer(page) {
+          viewport = page.getViewport(scale);
+          // Prepare canvas using PDF page dimensions
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+          // Render PDF page into canvas context
+          renderContext = {
+            canvasContext: context,
+            viewport: viewport
+          };
+         page.render(renderContext);
+        });
+    //    checkmax();
+      });
+    }
+  </script>

@@ -31,7 +31,6 @@ def pdf_view(request):
         return response
     pdf.closed
 
-@login_required
 def returnsomejson(request):
   Votes.send_notif()
   return JsonResponse({'x':'something'})
@@ -82,7 +81,6 @@ def lecture_list(request, course):
     documents = str(PDF.objects.values('pk', 'filename'))
     return JsonResponse(documents, safe=False)
 
-@login_required
 def select_lecture(request, key):
 # selects PDF with the key and marks as the user's active
 # returns true after selected
@@ -138,7 +136,6 @@ def get_pdf(request):
         return response
     pdf.closed
 
-@login_required
 def get_page_questions(request):
 # returns list of questions on user's page on the pdf, can be used q.text, q.pk, q.vote
     current = get_object_or_404(Current, owner = request.user, active=1)
@@ -147,7 +144,6 @@ def get_page_questions(request):
     return JsonResponse({'questions': displayQ})
 
 
-@login_required
 def get_qform(request):
 # returns a blank question form if the user can vote
 # returns false otherwise
@@ -158,13 +154,11 @@ def get_qform(request):
     else:
         return JsonResponse({'qform':False})
 
-@login_required
 def get_curr_page(request):
 # returns current page number for the user
     current = get_object_or_404(Current, owner = request.user, active=1)
     return JsonResponse({'page':current.page})
 
-@login_required
 def get_mood(request):
 # return mood status as percentages
     current = get_object_or_404(Current, owner = request.user, active=1)
@@ -188,7 +182,6 @@ def get_mood(request):
     return JsonResponse({'good': good*100/total, 'bad': bad*100/total})
 
 
-@login_required
 def go_next_page(request):
 # user moves to page+1. need to check if this is valid before calling. use pdf.js checkmax in frontend.
 # returns updated page number
@@ -200,7 +193,6 @@ def go_next_page(request):
         current.pdf.save()
     return JsonResponse({'page':current.page})
 
-@login_required
 def go_prev_page(request):
 # user moves to page-1. 
 # returns updated page number
@@ -213,7 +205,6 @@ def go_prev_page(request):
             current.pdf.save()
     return JsonResponse({'page':current.page})
 
-@login_required
 def go_curr_page(request):
 # user jumps to lecturer's current page. 
 # returns updated page number
@@ -222,7 +213,6 @@ def go_curr_page(request):
     mycurr.save()
     return JsonResponse({'page':mycurr.page})
 
-@login_required
 def vote_up(request):
 # user votes up on his current slide. 
 # returns true if voted, false otherwise.
@@ -241,7 +231,6 @@ def vote_up(request):
         pass
     return JsonResponse({'ack':False})
 
-@login_required
 def vote_down(request):
 # user votes down on his current slide. 
 # returns true if voted, false otherwise.
@@ -260,7 +249,6 @@ def vote_down(request):
         pass    
     return JsonResponse({'ack':False})
 
-@login_required
 def question(request):
 # user asks a question on his current slide. 
 # returns true if question asked, false otherwise.
@@ -276,7 +264,6 @@ def question(request):
         pass
     return JsonResponse({'ack':False})
 
-@login_required
 def qvote(request, question):
 # user votes up the question with given private key.
 # returns an ack for checking.
@@ -290,7 +277,6 @@ def qvote(request, question):
 
     return JsonResponse({'ack':question})
 
-@login_required
 def show_questions(request):
 # for lecturer to see all questions asked on his current lecture, from all pages.
 # returns a list of questions that can be used -- q.text , q.page, q.vote etc

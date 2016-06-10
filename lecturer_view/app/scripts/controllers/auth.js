@@ -8,7 +8,7 @@ app.controller('AuthCtrl', function ($scope, $location, AuthService) {
     if (username && password) {
       AuthService.register(username, password).then(
         function () {
-          $location.path('/dashboard');
+          $location.path('/mainmenu');
         },
         function (error) {
           $scope.registerError = error;
@@ -26,7 +26,7 @@ app.controller('AuthCtrl', function ($scope, $location, AuthService) {
     if (username && password) {
       AuthService.login(username, password).then(
         function () {
-          $location.path('/dashboard');
+          $location.path('/mainmenu');
         },
         function (error) {
           $scope.loginError = error;

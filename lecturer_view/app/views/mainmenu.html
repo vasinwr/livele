@@ -1,0 +1,40 @@
+<section>
+  <div class="Background-White" ng-hide="SharedData.mainmenuHide"
+                                ng-init="getleclist('username')">
+    <div class="sticky_menu">
+      <a href='#' class="lead">Slide app</a>
+    </div>
+
+    <div class="content container row-centered" style="padding-top:50px;">
+      <div class="mainmenu_icon col-md-4" ng-repeat="each in lecture_list track by each.pk"
+                                          ng-class="{grey: icon_hover}"
+                                          ng-click="select_slide(each.pk)">
+        <div class='inner_image'> 
+          <img class="icon_image" src='https://i.ytimg.com/vi/tntOCGkgt98/maxresdefault.jpg'> 
+        </div> 
+        <div class='headline'> 
+          {{each.filename}}
+        </div> 
+        <div style="float: left; background-color: red;"> info </div>
+        <div style="float: left; background-color: blue;"> start </div>
+        <div style="float: left; background-color: green;"> delete </div>
+        <div> 
+      </div> 
+    </div>
+      <div class="mainmenu_icon col-md-4"ng-class="{grey: icon_hover}">
+        <div class='inner_image'> 
+          <img class="icon_image" src=''> 
+        </div> 
+        <div class='headline'> 
+          upload new slides {{docs }}
+        </div> 
+        <div> 
+      </div>
+  </div>
+  <a href="http://127.0.0.1:8000/slides/login"> gogogo </a>
+  <a href="http://www.google.com"> gogogo </a>
+  <div ng-click="getjson()" class="red"> getjson </div>
+  {{ json }}
+<h1>Username: {{ username }}</h1>
+<a ng-click="logout()" class="btn btn-primary">Logout</a>
+</section>
