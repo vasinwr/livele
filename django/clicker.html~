@@ -1,0 +1,33 @@
+ {% load staticfiles %}
+<html ng-app="slides">
+
+<head>
+    <link href="{% static 'slides/bootstrap.min.css' %}" rel="stylesheet" />
+    <script type="text/javascript" src="{% static 'slides/angular.min.js' %}"></script>
+</head>
+<body ng-controller="slidesController as sCtrl">
+  asdf [[ 1+1 ]]
+  <br />
+  [[sCtrl.x.foo]]
+
+  <button ng-click="sCtrl.getjson()"> x </button>
+
+
+  <script>
+    var app = angular.module("slides",[]);
+    app.config(function($interpolateProvider){
+      $interpolateProvider.startSymbol("[[");
+      $interpolateProvider.endSymbol("]]");
+    });
+    app.controller('slidesController', ['$http', function($http){
+      var store = this;
+      this.x = {'foo': 'foo'};
+      this.getjson = function(){
+        $http.get(window.location.href+'getjson').success(function(data){
+          store.x = data;
+        });
+      };
+    }]);
+  </script>
+<body>
+</html>

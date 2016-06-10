@@ -31,18 +31,15 @@ def pdf_view(request):
         return response
     pdf.closed
 
-@login_required
+@csrf_exempt
+@token_required
 def returnsomejson(request):
   Votes.send_notif()
   return JsonResponse({'x':'something'})
 
-@login_required
-def course_list(request):
-    user_courses = request.user.groups.exclude(name = 'Lecturer').exclude(name = 'Student').values_list('name', flat=True)
-    return JsonResponse({'courses': user_courses})
-
 '''
-@login_required
+@csrf_exempt
+@token_required
 def course_index(request, course):
     course_group = Group.objects.get(name = course)
     # Handle file upload
@@ -51,7 +48,7 @@ def course_index(request, course):
         if form.is_valid():
             pdf = form.save(commit=False)
             pdf.course = course_group
-            pdf.lecturer = request.user
+            pdf.lecturer = request.token.user
             pdf.save()
             # Redirect to the document list after POST
             return HttpResponseRedirect(course)
@@ -68,27 +65,37 @@ def course_index(request, course):
     )
 
     # Render list page with the documents and the form
-    if(request.user.groups.filter(name = 'Lecturer').count() == 1):
+    if(request.token.user.groups.filter(name = 'Lecturer').count() == 1):
         return render(request, 'slides/course_index.html', {'course': course, 'lecturer':True, 'documents': documents, 'form': form})
     else:
         return render(request, 'slides/course_index.html', {'course': course, 'documents': documents, 'form': form})
 '''
 
+@csrf_exempt
+@token_required
+def course_list(request):
+# returns a list of courses the user is subscribed to
+# access c in course, c.pk, c.fields.name
+    user_courses = serializers.serialize("json", request.token.user.groups.exclude(name = 'Lecturer').exclude(name = 'Student'))
+    return JsonResponse({'courses': user_courses})
 
+@csrf_exempt
+@token_required
 def lecture_list(request, course):
 # returns a list of lectures(pdfs) in the selected course
-#    course_group = Group.objects.get(pk = course)
-#    documents = PDF.objects.filter(course = course_group)
-    documents = str(PDF.objects.values('pk', 'filename'))
+# access doc in documents, doc.pk, doc.fields.filename, doc.fields.someotherfield
+    course_group = Group.objects.get(pk = course)
+    documents = serializers.serialize("json", PDF.objects.filter(course = course_group))
     return JsonResponse(documents, safe=False)
 
-@login_required
+@csrf_exempt
+@token_required
 def select_lecture(request, key):
 # selects PDF with the key and marks as the user's active
 # returns true after selected
 #deactive all other actives.
     try:
-        other = Current.objects.get(owner = request.user, active=1)
+        other = Current.objects.get(owner = request.token.user, active=1)
         other.active = 0
         other.save()
     except Current.DoesNotExist:
@@ -96,19 +103,20 @@ def select_lecture(request, key):
 
     try:
         curr_pdf = get_object_or_404(PDF, pk = key)
-        current = Current.objects.get(owner = request.user, pdf = curr_pdf)
+        current = Current.objects.get(owner = request.token.user, pdf = curr_pdf)
         current.active = 1
         current.save()
     except Current.DoesNotExist:
-        current = Current(owner = request.user, pdf = curr_pdf, page=1, active=1)
+        current = Current(owner = request.token.user, pdf = curr_pdf, page=1, active=1)
         current.save()
 
     return JsonResponse({'ack':True})
 
 '''
-@login_required
+@csrf_exempt
+@token_required
 def lecture(request):
-    current = get_object_or_404(Current, owner = request.user, active=1)
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
     pdf = current.pdf
 
     votes = get_votes(request);
@@ -116,7 +124,7 @@ def lecture(request):
     bad = votes['bad']
     total = votes['total']
 
-    if(request.user.groups.filter(name = 'Lecturer').count() == 1):
+    if(request.token.user.groups.filter(name = 'Lecturer').count() == 1):
         return render(request, 'slides/lecture.html', {'pdffile': pdf.pdffile.url, 'pageCount':current.page, 'lecturer':True, 'votes_amplified':bad *100 / total, 'votes_rest': good*100/total})
     else:
         question_form = QuestionForm()
@@ -126,7 +134,7 @@ def lecture(request):
 '''
 
 def get_pdf(request):
-#    current = get_object_or_404(Current, owner = request.user, active=1)
+#    current = get_object_or_404(Current, owner = request.token.user, active=1)
     user = User.objects.get(username = 'lecturer1')
     current = Current.objects.get(owner = user, active = 1)
 #    print (os.path.join(settings.MEDIA_ROOT, current.pdf.pdffile))
@@ -138,44 +146,48 @@ def get_pdf(request):
         return response
     pdf.closed
 
-@login_required
+@csrf_exempt
+@token_required
 def get_page_questions(request):
-# returns list of questions on user's page on the pdf, can be used q.text, q.pk, q.vote
-    current = get_object_or_404(Current, owner = request.user, active=1)
+# returns list of questions on user's page on the pdf, can be used q.pk, q.fields.pk, q.fields.vote
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
     curr_qs = Question.objects.filter(pdf = current.pdf, page = current.page)
-    displayQ = curr_qs.annotate(votes = Count('question_vote')).order_by('-votes')
-    return JsonResponse({'questions': displayQ})
+    displayQ = serializers.serialize("json", curr_qs.annotate(votes = Count('question_vote')).order_by('-votes'))
+    return JsonResponse({'questions': displayQ}, safe=False)
 
 
-@login_required
+@csrf_exempt
+@token_required
 def get_qform(request):
 # returns a blank question form if the user can vote
 # returns false otherwise
     if (current.pdf.current_page >= current.page):
-        current = get_object_or_404(Current, owner = request.user, active=1)
+        current = get_object_or_404(Current, owner = request.token.user, active=1)
         question_form = QuestionForm()
         return JsonResponse({'qform':question_form})
     else:
         return JsonResponse({'qform':False})
 
-@login_required
+@csrf_exempt
+@token_required
 def get_curr_page(request):
 # returns current page number for the user
-    current = get_object_or_404(Current, owner = request.user, active=1)
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
     return JsonResponse({'page':current.page})
 
-@login_required
+@csrf_exempt
+@token_required
 def get_mood(request):
 # return mood status as percentages
-    current = get_object_or_404(Current, owner = request.user, active=1)
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
     curr_pdf = current.pdf
 
     canVote = curr_pdf.current_page >= current.page
-    if(canVote and request.user.groups.filter(name = 'Student').count() == 1):
+    if(canVote and request.token.user.groups.filter(name = 'Student').count() == 1):
         try:
-            myvote = Votes.objects.get(user = request.user, pdf = curr_pdf, page = current.page)
+            myvote = Votes.objects.get(user = request.token.user, pdf = curr_pdf, page = current.page)
         except Votes.DoesNotExist:
-            v = Votes(user = request.user, pdf = curr_pdf, page = current.page, value = 0)
+            v = Votes(user = request.token.user, pdf = curr_pdf, page = current.page, value = 0)
             v.save()
 
     good = Votes.objects.filter(pdf = curr_pdf, page = current.page, value = 0).count()
@@ -188,52 +200,56 @@ def get_mood(request):
     return JsonResponse({'good': good*100/total, 'bad': bad*100/total})
 
 
-@login_required
+@csrf_exempt
+@token_required
 def go_next_page(request):
 # user moves to page+1. need to check if this is valid before calling. use pdf.js checkmax in frontend.
 # returns updated page number
-    current = get_object_or_404(Current, owner = request.user, active=1)
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
     current.page +=1
     current.save()
-    if(request.user.groups.filter(name = 'Lecturer').count() == 1):
+    if(request.token.user.groups.filter(name = 'Lecturer').count() == 1):
         current.pdf.current_page = current.page
         current.pdf.save()
     return JsonResponse({'page':current.page})
 
-@login_required
+@csrf_exempt
+@token_required
 def go_prev_page(request):
 # user moves to page-1. 
 # returns updated page number
-    current = get_object_or_404(Current, owner = request.user, active=1)
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
     if (current.page > 1):
         current.page -= 1
         current.save()
-        if(request.user.groups.filter(name = 'Lecturer').count() == 1):
+        if(request.token.user.groups.filter(name = 'Lecturer').count() == 1):
             current.pdf.current_page -= 1
             current.pdf.save()
     return JsonResponse({'page':current.page})
 
-@login_required
+@csrf_exempt
+@token_required
 def go_curr_page(request):
 # user jumps to lecturer's current page. 
 # returns updated page number
-    mycurr = get_object_or_404(Current, owner = request.user, active=1)
+    mycurr = get_object_or_404(Current, owner = request.token.user, active=1)
     mycurr.page = mycurr.pdf.current_page
     mycurr.save()
     return JsonResponse({'page':mycurr.page})
 
-@login_required
+@csrf_exempt
+@token_required
 def vote_up(request):
 # user votes up on his current slide. 
 # returns true if voted, false otherwise.
-    current = get_object_or_404(Current, owner = request.user, active=1)
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
 
     if (current.pdf.current_page >= current.page):
         try:
-            v = Votes.objects.get(user = request.user, pdf = current.pdf, page = current.page)
+            v = Votes.objects.get(user = request.token.user, pdf = current.pdf, page = current.page)
             v.value = 0
         except Votes.DoesNotExist:
-            v = Votes(user = request.user, pdf = current.pdf, page = current.page, value = 0)
+            v = Votes(user = request.token.user, pdf = current.pdf, page = current.page, value = 0)
         v.save()
         v.send_notification(get_votes(request))
         return JsonResponse({'ack':True})
@@ -241,18 +257,19 @@ def vote_up(request):
         pass
     return JsonResponse({'ack':False})
 
-@login_required
+@csrf_exempt
+@token_required
 def vote_down(request):
 # user votes down on his current slide. 
 # returns true if voted, false otherwise.
-    current = get_object_or_404(Current, owner = request.user, active=1)
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
 
     if (current.pdf.current_page >= current.page):
         try:
-            v = Votes.objects.get(user = request.user, pdf = current.pdf, page = current.page)
+            v = Votes.objects.get(user = request.token.user, pdf = current.pdf, page = current.page)
             v.value = 1
         except Votes.DoesNotExist:
-            v = Votes(user = request.user, pdf = current.pdf, page = current.page, value = 1)
+            v = Votes(user = request.token.user, pdf = current.pdf, page = current.page, value = 1)
         v.save()
         v.send_notification(get_votes(request))
         return JsonResponse({'ack':True})
@@ -260,14 +277,15 @@ def vote_down(request):
         pass    
     return JsonResponse({'ack':False})
 
-@login_required
+@csrf_exempt
+@token_required
 def question(request):
 # user asks a question on his current slide. 
 # returns true if question asked, false otherwise.
-    current = get_object_or_404(Current, owner = request.user, active=1)
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
 
     if (current.pdf.current_page >= current.page):
-        dummy = Question(user = request.user, pdf = current.pdf, page = current.page, text = "")
+        dummy = Question(user = request.token.user, pdf = current.pdf, page = current.page, text = "")
         dummy.save()
         question = QuestionForm(request.POST, instance = dummy)
         question.save()
@@ -276,42 +294,52 @@ def question(request):
         pass
     return JsonResponse({'ack':False})
 
-@login_required
+@csrf_exempt
+@token_required
 def qvote(request, question):
 # user votes up the question with given private key.
 # returns an ack for checking.
     q = get_object_or_404(Question, pk = question)
 
     try:
-        v = Question_Vote.objects.get(user = request.user, question = q)
+        v = Question_Vote.objects.get(user = request.token.user, question = q)
     except Question_Vote.DoesNotExist:
-        v = Question_Vote(user = request.user, question = q)
+        v = Question_Vote(user = request.token.user, question = q)
         v.save()
 
     return JsonResponse({'ack':question})
 
-@login_required
+@csrf_exempt
+@token_required
 def show_questions(request):
 # for lecturer to see all questions asked on his current lecture, from all pages.
-# returns a list of questions that can be used -- q.text , q.page, q.vote etc
-    current = get_object_or_404(Current, owner = request.user, active=1)
+# returns a list of questions that can be used -- q.fields.text , q.fields.page, q.fields.vote etc
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
 
     curr_qs = Question.objects.filter(pdf = current.pdf)
-    displayQ = curr_qs.annotate(votes = Count('question_vote')).order_by('-votes')
+    displayQ = serializers.serialize("json", curr_qs.annotate(votes = Count('question_vote')).order_by('-votes'))
 
-    return JsonResponse({'questions':displayQ})
+    return JsonResponse({'questions':displayQ}, safe=False)
+
+
+
+#-------------------------------------------------------------------------------------------------
+#login / logout stuff
+#-------------------------------------------------------------------------------------------------
 
 
 '''
-@login_required
+@csrf_exempt
+@token_required
 def home(request):
-    return HttpResponseRedirect(reverse('slides:index', args=[request.user.username]))
+    return HttpResponseRedirect(reverse('slides:index', args=[request.token.user.username]))
 '''
 '''
 def login(request):
     return HttpResponseRedirect('/login/')
 '''
-@login_required
+@csrf_exempt
+@token_required
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect('/login/')

@@ -26,9 +26,9 @@
   </head>
 <!-- ------------------------------------------------------------------------- -->
   <body>
-    <section ng-controller="MainmenuController as mmCtrl">
+    <section ng-controller="MainmenuController as mmCtrl" ng-init="init()">
       <div class="Background-White" ng-hide="mmCtrl.SharedData.mainmenuHide"
-                                    ng-init="mmCtrl.getleclist('username')">
+                                    ng-init="mmCtrl.getleclist">
         <div class="sticky_menu">
 	  <a href='#' class="lead"  ng-click="mmCtrl.SharedData.mainmenuHide = true">Slide app</a>
 	</div>
@@ -54,7 +54,7 @@
 	      <img class="icon_image" src=''> 
 	    </div> 
 	    <div class='headline'> 
-              upload new slides {{mmCtrl.docs }}
+              upload new slides
 	    </div> 
             <div> 
 	  </div>
@@ -206,22 +206,12 @@
     <script src="/bower_components/bootstrap/js/scrollspy.js"></script>
     <script src="/bower_components/bootstrap/js/collapse.js"></script>
     <script src="/bower_components/bootstrap/js/tab.js"></script>
-
-        <script src="/bower_components/angular-cookies/angular-cookies.js"></script>
-        <script src="/bower_components/angular-resource/angular-resource.js"></script>
-        <script src="/bower_components/angular-sanitize/angular-sanitize.js"></script>
-        <script src="/bower_components/angular-route/angular-route.js"></script>
-
     <!-- endbuild -->
     
     <!-- build:js scripts/main.js -->
     <script src="scripts/websocket.js"></script>
     <script src="scripts/mousetrap.js"></script>
     <script src="scripts/main.js"></script>
-        <script src="scripts/controllers/auth.js"></script>
-        <script src="scripts/controllers/dashboard.js"></script>
-        <script src="scripts/services/auth.js"></script>
-
     <!-- endbuild -->
   </body>
 </html>

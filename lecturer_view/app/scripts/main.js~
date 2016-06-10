@@ -35,6 +35,8 @@ app.controller('MainmenuController', ['$http', 'SharedData', function($http, Sha
   this.SharedData = SharedData;
   this.hide = false; 
   this.docs = {};
+  this.xs = this.docs; //this.xs = lecutre_list().docs;
+//this.xs = [{'pk': 6, 'filename': 'CH1'}, {'pk': 7, 'filename': 'BP'}]
   this.icon_hover = false;
 
   var ctrl = this;
@@ -58,7 +60,9 @@ app.controller('MainmenuController', ['$http', 'SharedData', function($http, Sha
   this.getleclist = function(name){
     console.log("a");
     $http.get('http://127.0.0.1:8000/slides/lecture_list/a').success(function(data){
-     ctrl.docs = eval(data);
+     //console.log(ctrl.xs == eval(JSON.parse(data)));
+     ctrl.xs = eval(JSON.parse(data));
+     ctrl.docs = ctrl.xs;
     });
    };
   this.getpdf = function(){
