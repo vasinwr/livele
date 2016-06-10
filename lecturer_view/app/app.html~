@@ -77,15 +77,13 @@
     
       <div class="Left-Container" ng-class="{'Side-Hover' : sides.left_hover}" 
                                   ng-mouseover="sides.left_hover = true"
-                                  ng-mouseleave="sides.left_hover = false"
-                                  ng-click="sides.left_click()">
+                                  ng-mouseleave="sides.left_hover = false">
         <div id="prev"><i class="fa fa-angle-left fa-2x" aria-hidden="true"></i></div>
       </div>
       <canvas id="pdfviewer"></canvas>
       <div class="Right-Container" ng-class="{'Side-Hover' : sides.right_hover}" 
                                   ng-mouseover="sides.right_hover = true"
-                                  ng-mouseleave="sides.right_hover = false"
-                                  ng-click="sides.right_click()">
+                                  ng-mouseleave="sides.right_hover = false">
         <div id="next"><i class="fa fa-angle-right fa-2x" aria-hidden="true"></i></div>
       </div>
 
