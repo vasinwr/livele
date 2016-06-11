@@ -1,7 +1,8 @@
+<div id="lecturer_view" ng-controller="LectureCtrl">
     <!-- Top half -->
     <div class="Top-Half">
     
-      <div class="Left-Container" ng-class="{'Side-Hover' : left_hover}" 
+      <div class="Left-Container" onclick="al()" ng-class="{'Side-Hover' : left_hover}" 
                                   ng-mouseover="left_hover = true"
                                   ng-mouseleave="left_hover = false">
         <div id="prev"><i class="fa fa-angle-left fa-2x" aria-hidden="true"></i></div>
@@ -90,42 +91,78 @@
       </div>
     </div>
     <div class="Background-Dark" ng-show="clicked"></div>
+</div>
+
+    <script> 
+// example of calling controller function from outside controller, click left to try
+var al = function al(){
+  var scope = angular.element(document.getElementById('lecturer_view')).scope();
+  scope.$apply(function(){
+    scope.update_question('x');
+  });
+}
+    </script>
+    <!-- websocket control -->
     <script>
-      Mousetrap.bind(['right','space'], function() { alert('next page') });
+      console.log('websocket.js used');
+      var socket = new WebSocket('ws://127.0.0.1:8000/all/');
+      socket.onmessage = function(message){
+        var data = JSON.parse(message.data);
+        if(data.type == 'bar'){
+          document.getElementById('red_bar').style.width = data.red_bar + '%';
+          document.getElementById('green_bar').style.width = data.green_bar + '%';
+        }
+        if(data.type == 'question'){
+          // call controller function: update_question(data.questions)
+          var scope = angular.element(document.getElementById('lecturer_view')).scope();
+          scope.$apply(function(){
+            scope.update_question(data.questions);
+          });
+        }
+        if(data.type == 'summary'){
+          // call controller function: update_summary(data.summary)
+        }
+      }
+    </script>
+
+    <!-- mousetrap control -->
+    <script>
+      Mousetrap.bind(['right','space'], al);
       Mousetrap.bind('left', function() { alert('previous page') });
     </script>
 
+    <!-- pdfjs control -->
     <script>
-    var url ='http://127.0.0.1:8000/slides/get_pdf';
-    //window.open(url);
-    console.log(url);
-    var maxPages = 0;
-    var scale = 1.5;
-    var canvas = document.getElementById('pdfviewer');
-    var context = canvas.getContext('2d');
-    var viewport = 0;
-    var renderContext = 0;
-    var page_no = 1;
-    getPDF();
-    function getPDF() {
-      PDFJS.disableWorker = true;
-    //  PDFJS.workerSrc = "scripts/pdf.worker.js";
-      PDFJS.getDocument(url).then(function getPdfViewer(pdf) {
-        // Fetch the first page
-        maxPages = pdf.numPages;
-        pdf.getPage(page_no).then(function getPageViewer(page) {
-          viewport = page.getViewport(scale);
-          // Prepare canvas using PDF page dimensions
-          canvas.height = viewport.height;
-          canvas.width = viewport.width;
-          // Render PDF page into canvas context
-          renderContext = {
-            canvasContext: context,
-            viewport: viewport
-          };
-         page.render(renderContext);
+      var url ='http://127.0.0.1:8000/slides/get_pdf';
+      //window.open(url);
+      console.log(url);
+      var maxPages = 0;
+      var scale = 1.5;
+      var canvas = document.getElementById('pdfviewer');
+      var context = canvas.getContext('2d');
+      var viewport = 0;
+      var renderContext = 0;
+      var page_no = 1;
+      getPDF();
+      function getPDF() {
+        PDFJS.disableWorker = true;
+      //  PDFJS.workerSrc = "scripts/pdf.worker.js";
+        PDFJS.getDocument(url).then(function getPdfViewer(pdf) {
+          // Fetch the first page
+          maxPages = pdf.numPages;
+          pdf.getPage(page_no).then(function getPageViewer(page) {
+            viewport = page.getViewport(scale);
+            // Prepare canvas using PDF page dimensions
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            // Render PDF page into canvas context
+            renderContext = {
+              canvasContext: context,
+              viewport: viewport
+            };
+            page.render(renderContext);
+          });
+      //    checkmax();
         });
-    //    checkmax();
-      });
-    }
+      }
   </script>
