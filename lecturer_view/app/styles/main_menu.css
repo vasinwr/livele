@@ -9,11 +9,9 @@
 }
 
 .mainmenu_icon {
-  position: relative;
-  float: left;
   height: 350px;
   width: 250px;
-  box-shadow: 0px 0px 2px #111;
+  margin: auto;
   z-index: 10;
 }
 
@@ -26,37 +24,38 @@
   height: 250px;
 }
 
-.grey{
-  background-color: grey;
-}
 
-.sticky_menu{
-	background-color: #000000;
+
+.course_menu{
+        background-color: green;
 	color: #aaaaaa;
-	width: 100%;
-	padding-top: 10px;
-	padding-left: 10%;
+        width: 20%;
+        min-width: 150px;
+	max-width: 300px;
+        height: 100%;
+	padding-top: 50px;
 	font-size: 20pt;
-	position:fixed;
+	position:relative;
+        float:left;
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-	z-index: 100;
+        z-index: 90;
 
 }
-.sticky_menu a:link{
-	color:#ddd;
-	text-decoration: none;
-}
-
-.sticky_menu a:visited{
-	color:#ddd;
-	text-decoration: none;
-}
-
-.sticky_menu a:hover{
+.course_menu div:hover{
+        background-color: red;
 	color:white ;
 	text-decoration: none;
 }
-.sticky_menu a:active{
-	color:#ddd;
-	text-decoration: none;
+
+.course {
+    text-align: center;
+}
+
+#menu_con {
+  position:absolute;
+  right: 0px;
+  width: 70%;
+  height:100%;
+  overflow:auto;
+  padding-top:50px; 
 }

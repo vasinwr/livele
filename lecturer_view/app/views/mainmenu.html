@@ -1,13 +1,18 @@
 <section>
-  <div class="Background-White" ng-init="getleclist('username')">
-    <div class="sticky_menu">
-      <a href='#' class="lead">Slide app</a>
-    </div>
+  <div class="Background-White" ng-init="getcourses()">
 
-    <div class="content container row-centered" style="padding-top:50px;">
-      <div class="mainmenu_icon col-md-4" ng-repeat="each in lecture_list track by each.pk"
+      <div class="course_menu">
+        <div class="course" ng-repeat="c in course_list track by c.pk"
+                            ng-click="select_course()"> {{ c.fields.name }} </div>
+      </div>
+    <div id="menu_con" class="content container row-centered">
+
+      <div class="mainmenu_icon col-md-4 col-sm-6" ng-repeat="each in lecture_list"
                                           ng-class="{grey: icon_hover}"
                                           ng-click="select_slide(each.pk)">
+      <!--div class="mainmenu_icon" ng-repeat="each in lecture_list track by each.pk"
+                                          ng-class="{grey: icon_hover}"
+                                          ng-click="select_slide(each.pk)"-->
         <div class='inner_image'> 
           <img class="icon_image" src='https://i.ytimg.com/vi/tntOCGkgt98/maxresdefault.jpg'> 
         </div> 
@@ -20,20 +25,14 @@
         <div> 
       </div> 
     </div>
-      <div class="mainmenu_icon col-md-4"ng-class="{grey: icon_hover}">
-        <div class='inner_image'> 
-          <img class="icon_image" src=''> 
-        </div> 
-        <div class='headline'> 
-          upload new slides {{docs }}
-        </div> 
-        <div> 
-      </div>
   </div>
-  <a href="http://127.0.0.1:8000/slides/login"> gogogo </a>
-  <a href="http://www.google.com"> gogogo </a>
-  <div ng-click="getjson()" class="red"> getjson </div>
-  {{ json }}
-<h1>Username: {{ username }}</h1>
-<a ng-click="logout()" class="btn btn-primary">Logout</a>
+  <div id="extras" style="position:absolute; bottom:0px; right:0px; border-style:dotted;">
+    <a href="http://127.0.0.1:8000/slides/login"> gogogo </a>
+    <a href="http://www.google.com"> gogogo </a>
+    <div ng-click="getjson()" class="red"> getjson </div>
+    {{ json }} <br>
+    {{ course_list }}
+    <p>Username: {{ username }} </p>
+    <a ng-click="logout()" class="btn btn-primary">Logout</a>
+  </div>
 </section>
