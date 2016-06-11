@@ -34,7 +34,7 @@ app.controller('MainmenuCtrl', function($scope, $http, $window, $location, AuthS
    };
   $scope.select_slide = function(pk){
     // Derek: set database to save that this user picks this lecture(pk)
-    console.log("slide selected");
+    console.log('slide selected');
       // this will jump to another html section with another controller so it will not know about this pk
       $location.path('/lecture');
   }

@@ -1,1 +1,51 @@
-<!-- student view here -->
+
+    <!-- Top half -->
+    <div class="row">
+      <div class="col-lg-6">
+        <canvas id="pdfviewer"></canvas>
+        <div class="Buttons">
+          <div class="Left-Button" ng-class="{'Side-Hover' : sides.left_hover}" 
+                                   ng-mouseover="sides.left_hover = true"
+                                   ng-mouseleave="sides.left_hover = false">
+            <div id="prev"><i class="fa fa-angle-left fa-2x" aria-hidden="true"></i></div>
+          </div>
+          <div class="Middle-Button" ng-click="current"> 
+            <div id="curr">Current</div>
+          </div>
+          <div class="Right-Button" ng-class="{'Side-Hover' : sides.right_hover}" 
+                                    ng-mouseover="sides.right_hover = true"
+                                    ng-mouseleave="sides.right_hover = false">
+            <div id="next"><i class="fa fa-angle-right fa-2x" aria-hidden="true"></i></div>
+          </div>
+        </div>
+        <div class="Vote-Buttons">
+          <button ng-click="happy"><i class="fa fa-smile-o fa-3x" aria-hidden="true"></i></button>
+          <button ng-click="unhappy"><i class="fa fa-frown-o fa-3x" aria-hidden="true"></i></button>
+          <button ng-click="fast">Too Slow</button>
+          <button ng-click="slow">Too Fast</button>
+        </div>
+        <div class="Bar-Container">
+          <p class="lead">Current class status</p>
+          <div class="progress progress">
+            <div id="red_bar" class="progress-bar progress-bar-danger" style="width: 80%"></div>
+            <div class="progress-bar progress-bar-warning" style="width: 0%"></div>
+            <div id="green_bar" class="progress-bar progress-bar-success" style="width: 20%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="Rightpage-Container">
+          <p class="lead"> Questions </p> 
+          <p class="lead normal-font" ng-repeat="question in questions">
+            <input type="text" ng-model="question">
+            <button ng-click="upvote($index)"><i class="fa fa-thumbs-up" aria-hidden="true"></i></button>
+          </p>
+        </div>
+        <form role="form" ng-submit="addQuestion()">
+          <input id="question" type="text" ng-model="question" placeholder="Ask a Question!">
+          <input type="submit" value="Ask" style="float: right">
+        </form>
+      </div>
+    </div>
+
