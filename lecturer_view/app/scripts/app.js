@@ -21,6 +21,10 @@ app.config(['$routeProvider','$httpProvider', function($routeProvider, $httpProv
       templateUrl: 'views/lecture.html',
       controller: 'LectureCtrl'
     })
+    .when('/student', {
+      templateUrl: 'views/student_view.html',
+      controller: 'StudentViewCtrl'
+    }
     .otherwise({
       redirectTo: '/'
     });
