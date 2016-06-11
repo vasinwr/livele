@@ -1,5 +1,5 @@
     <!-- Top half -->
-    <div id="top-half" class="Top-Half">
+    <div class="Top-Half">
     
       <div class="Left-Container" ng-class="{'Side-Hover' : left_hover}" 
                                   ng-mouseover="left_hover = true"
@@ -90,6 +90,10 @@
       </div>
     </div>
     <div class="Background-Dark" ng-show="clicked"></div>
+    <script>
+      Mousetrap.bind(['right','space'], function() { alert('next page') });
+      Mousetrap.bind('left', function() { alert('previous page') });
+    </script>
 
     <script>
     var url ='http://127.0.0.1:8000/slides/get_pdf';
