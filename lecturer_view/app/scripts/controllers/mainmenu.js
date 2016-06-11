@@ -16,14 +16,14 @@ app.controller('MainmenuCtrl', function($scope, $http, $window, $location, AuthS
     );
   };
 
+  $scope.json = {'x': 'nothing'};
   $scope.lecture_list = {};
   $scope.icon_hover = false;
 
   var ctrl = $scope;
-  $scope.json = {'x':'nothing'};
 
   $scope.getjson = function(){
-    $http.get('http://127.0.0.1:8000/slides/returnsomejson').success(function(data){
+    $http.get('http://127.0.0.1:8000/slides/returnsomejson/').success(function(data){
       ctrl.json = data;
     });
   };

@@ -51,7 +51,7 @@ app.controller('MainmenuController', ['$http', 'SharedData', function($http, Sha
 
   this.getlecture = function(key){
     console.log(key);
-    console.log("blah")
+    console.log('blah')
     $http.get('http://127.0.0.1:8000/slides/select_lecture/'+key).success(function(data){
     //ctrl.json = data;
     });
@@ -65,13 +65,13 @@ app.controller('MainmenuController', ['$http', 'SharedData', function($http, Sha
     });
   };
   this.getleclist = function(name){
-    console.log("a");
+    console.log('a');
     $http.get('http://127.0.0.1:8000/slides/lecture_list/a').success(function(data){
      ctrl.docs = eval(data);
     });
    };
   this.getpdf = function(){
-    console.log("getpdf");
+    console.log('getpdf');
     getPDF();
   }
   }]);

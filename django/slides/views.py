@@ -35,8 +35,8 @@ def pdf_view(request):
 @csrf_exempt
 @token_required
 def returnsomejson(request):
-  Votes.send_notif()
-  return JsonResponse({'x':'something'})
+  #Votes.send_notif()
+  return json_response({'x':'something'})
 
 '''
 @csrf_exempt
