@@ -15,9 +15,18 @@ app.controller('LectureCtrl', function($scope, $window, $location){
   $scope.close_hover =false ;
   $scope.ques = [{question: 'what happens if I fail?', votes: 10}, 
                {question: 'are labs open on bank holiday', votes: 8},
-               {question: 'what happened to our coke machine', votes: 3}]
+               {question: 'what happened to our coke machine', votes: 3}];
 
+  var ctrl = $scope;
+  $scope.update_question = function(questions){
+    //TODO: questions received from websocket message (top 3 questions)
+    ctrl.ques = questions;
+  };
+  $scope.update_summary = function(summary){
+    //TODO: summary received from websocket message 
+    ctrl.summary = summary;
+  };
   $scope.backhome = function(){
     $location.path('/mainmenu');
-  }
+  };
 });
