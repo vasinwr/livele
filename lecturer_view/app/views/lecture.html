@@ -98,7 +98,7 @@
 var al = function al(){
   var scope = angular.element(document.getElementById('lecturer_view')).scope();
   scope.$apply(function(){
-    scope.update_question('x');
+    scope.click('x');
   });
 }
     </script>
@@ -133,7 +133,7 @@ var al = function al(){
 
     <!-- pdfjs control -->
     <script>
-      var url ='http://127.0.0.1:8000/slides/get_pdf';
+      var url ='http://127.0.0.1:8000/slides/get_pdf/';
       //window.open(url);
       console.log(url);
       var maxPages = 0;
@@ -143,11 +143,17 @@ var al = function al(){
       var viewport = 0;
       var renderContext = 0;
       var page_no = 1;
+
+      // adding token header to pdfjs request
+      var docInitParams = new Object();
+      docInitParams.url = url;
+      docInitParams.httpHeaders = {"Authorization":"Token "+localStorage.getItem('token')};
+      
       getPDF();
       function getPDF() {
         PDFJS.disableWorker = true;
       //  PDFJS.workerSrc = "scripts/pdf.worker.js";
-        PDFJS.getDocument(url).then(function getPdfViewer(pdf) {
+        PDFJS.getDocument(docInitParams).then(function getPdfViewer(pdf) {
           // Fetch the first page
           maxPages = pdf.numPages;
           pdf.getPage(page_no).then(function getPageViewer(page) {

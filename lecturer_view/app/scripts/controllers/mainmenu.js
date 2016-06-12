@@ -1,5 +1,5 @@
 app.controller('MainmenuCtrl', function($scope, $http, $window, $location, AuthService){
- /* if (!$window.localStorage.token) {
+  if (!$window.localStorage.token) {
     $location.path('/');
     return;
   }
@@ -15,7 +15,6 @@ app.controller('MainmenuCtrl', function($scope, $http, $window, $location, AuthS
       }
     );
   };
-*/
   $scope.json = {'x': 'nothing'};
   $scope.lecture_list = [];
   $scope.icon_hover = false;

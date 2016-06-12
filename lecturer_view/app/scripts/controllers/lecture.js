@@ -29,4 +29,8 @@ app.controller('LectureCtrl', function($scope, $window, $location){
   $scope.backhome = function(){
     $location.path('/mainmenu');
   };
+  $scope.click = function(summary){
+    //TODO: summary received from websocket message 
+    ctrl.clicked = true;
+  };
 });
