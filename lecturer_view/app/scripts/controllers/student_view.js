@@ -11,7 +11,9 @@ app.controller('StudentViewCtrl', function($scope, $window, $location){
     $location.path('/mainmenu');
   }
 
-  $scope.questions = []; //<---function to get questions
+  $scope.ques = [{question: 'Question 1', votes: 10}, 
+               {question: 'Question 2', votes: 8},
+               {question: 'Question 3', votes: 3}];
 
   $scope.addQuestion = function() {
     //function to add Question to database
