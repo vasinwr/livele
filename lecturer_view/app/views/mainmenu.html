@@ -3,7 +3,7 @@
 
       <div class="course_menu">
         <div class="course" ng-repeat="c in course_list track by c.pk"
-                            ng-click="select_course()"> {{ c.fields.name }} </div>
+                            ng-click="select_course(c.pk)"> {{ c.fields.name }} </div>
       </div>
     <div id="menu_con" class="content container row-centered">
 
@@ -17,7 +17,7 @@
           <img class="icon_image" src='https://i.ytimg.com/vi/tntOCGkgt98/maxresdefault.jpg'> 
         </div> 
         <div class='headline'> 
-          {{each.filename}}
+          {{each.fields.filename}}
         </div> 
         <div style="float: left; background-color: red;"> info </div>
         <div style="float: left; background-color: blue;"> start </div>
@@ -31,7 +31,7 @@
     <a href="http://www.google.com"> gogogo </a>
     <div ng-click="getjson()" class="red"> getjson </div>
     {{ json }} <br>
-    {{ course_list }}
+    {{ course_list}}
     <p>Username: {{ username }} </p>
     <a ng-click="logout()" class="btn btn-primary">Logout</a>
   </div>

@@ -78,7 +78,7 @@ def course_list(request):
 # returns a list of courses the user is subscribed to
 # access c in course, c.pk, c.fields.name
     user_courses = serializers.serialize("json", request.token.user.groups.exclude(name = 'Lecturer').exclude(name = 'Student'))
-    return JsonResponse({'courses': user_courses})
+    return JsonResponse(user_courses, safe = False)
 
 @csrf_exempt
 @token_required
@@ -135,10 +135,12 @@ def lecture(request):
         return render(request, 'slides/lecture.html', {'pdffile': pdf.pdffile.url, 'pageCount':current.page, 'student':True, 'qform':question_form, 'questions': displayQ, 'votes_amplified':bad*100/total, 'votes_rest': good*100/ total})
 '''
 
+@csrf_exempt
+@token_required
 def get_pdf(request):
-#    current = get_object_or_404(Current, owner = request.token.user, active=1)
-    user = User.objects.get(username = 'lecturer1')
-    current = Current.objects.get(owner = user, active = 1)
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
+#    user = User.objects.get(username = 'lecturer1')
+#    current = Current.objects.get(owner = user, active = 1)
 #    print (os.path.join(settings.MEDIA_ROOT, current.pdf.pdffile))
     with open(os.path.join(settings.MEDIA_ROOT, str(current.pdf.pdffile)) ,'rb') as pdf:
         response = HttpResponse(pdf.read(), content_type='application/pdf')

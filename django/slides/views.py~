@@ -31,16 +31,12 @@ def pdf_view(request):
         return response
     pdf.closed
 
+
 @csrf_exempt
 @token_required
 def returnsomejson(request):
-  Votes.send_notif()
-  return JsonResponse({'x':'something'})
-
-def course_list(request):
-#    user_courses = request.token.user.groups.exclude(name = 'Lecturer').exclude(name = 'Student').values_list('name', flat=True)
-    user_courses = serializers.serialize("json", Group.objects.exclude(name = 'Lecturer').exclude(name = 'Student'))
-    return JsonResponse({'courses': user_courses})
+  #Votes.send_notif()
+  return json_response({'x':'something'})
 
 '''
 @csrf_exempt
@@ -78,12 +74,21 @@ def course_index(request, course):
 
 @csrf_exempt
 @token_required
+def course_list(request):
+# returns a list of courses the user is subscribed to
+# access c in course, c.pk, c.fields.name
+    user_courses = serializers.serialize("json", request.token.user.groups.exclude(name = 'Lecturer').exclude(name = 'Student'))
+    return JsonResponse(user_courses, safe = False)
+
+@csrf_exempt
+@token_required
 def lecture_list(request, course):
 # returns a list of lectures(pdfs) in the selected course
 # access doc in documents, doc.pk, doc.fields.filename, doc.fields.someotherfield
     course_group = Group.objects.get(pk = course)
     documents = serializers.serialize("json", PDF.objects.filter(course = course_group))
     return JsonResponse(documents, safe=False)
+
 
 @csrf_exempt
 @token_required
@@ -131,9 +136,9 @@ def lecture(request):
 '''
 
 def get_pdf(request):
-#    current = get_object_or_404(Current, owner = request.token.user, active=1)
-    user = User.objects.get(username = 'lecturer1')
-    current = Current.objects.get(owner = user, active = 1)
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
+#    user = User.objects.get(username = 'lecturer1')
+#    current = Current.objects.get(owner = user, active = 1)
 #    print (os.path.join(settings.MEDIA_ROOT, current.pdf.pdffile))
     with open(os.path.join(settings.MEDIA_ROOT, str(current.pdf.pdffile)) ,'rb') as pdf:
         response = HttpResponse(pdf.read(), content_type='application/pdf')
@@ -143,6 +148,7 @@ def get_pdf(request):
         return response
     pdf.closed
 
+
 @csrf_exempt
 @token_required
 def get_page_questions(request):
@@ -151,6 +157,7 @@ def get_page_questions(request):
     curr_qs = Question.objects.filter(pdf = current.pdf, page = current.page)
     displayQ = serializers.serialize("json", curr_qs.annotate(votes = Count('question_vote')).order_by('-votes'))
     return JsonResponse({'questions': displayQ}, safe=False)
+
 
 
 @csrf_exempt
@@ -165,12 +172,14 @@ def get_qform(request):
     else:
         return JsonResponse({'qform':False})
 
+
 @csrf_exempt
 @token_required
 def get_curr_page(request):
 # returns current page number for the user
     current = get_object_or_404(Current, owner = request.token.user, active=1)
     return JsonResponse({'page':current.page})
+
 
 @csrf_exempt
 @token_required
@@ -197,6 +206,7 @@ def get_mood(request):
     return JsonResponse({'good': good*100/total, 'bad': bad*100/total})
 
 
+
 @csrf_exempt
 @token_required
 def go_next_page(request):
@@ -209,6 +219,7 @@ def go_next_page(request):
         current.pdf.current_page = current.page
         current.pdf.save()
     return JsonResponse({'page':current.page})
+
 
 @csrf_exempt
 @token_required
@@ -224,6 +235,7 @@ def go_prev_page(request):
             current.pdf.save()
     return JsonResponse({'page':current.page})
 
+
 @csrf_exempt
 @token_required
 def go_curr_page(request):
@@ -233,6 +245,7 @@ def go_curr_page(request):
     mycurr.page = mycurr.pdf.current_page
     mycurr.save()
     return JsonResponse({'page':mycurr.page})
+
 
 @csrf_exempt
 @token_required
@@ -254,6 +267,7 @@ def vote_up(request):
         pass
     return JsonResponse({'ack':False})
 
+
 @csrf_exempt
 @token_required
 def vote_down(request):
@@ -274,6 +288,7 @@ def vote_down(request):
         pass    
     return JsonResponse({'ack':False})
 
+
 @csrf_exempt
 @token_required
 def question(request):
@@ -291,6 +306,7 @@ def question(request):
         pass
     return JsonResponse({'ack':False})
 
+
 @csrf_exempt
 @token_required
 def qvote(request, question):
@@ -305,6 +321,7 @@ def qvote(request, question):
         v.save()
 
     return JsonResponse({'ack':question})
+
 
 @csrf_exempt
 @token_required

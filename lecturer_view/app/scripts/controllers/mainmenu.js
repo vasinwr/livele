@@ -17,7 +17,7 @@ app.controller('MainmenuCtrl', function($scope, $http, $window, $location, AuthS
   };
 */
   $scope.json = {'x': 'nothing'};
-  $scope.lecture_list = [1, 2];
+  $scope.lecture_list = [];
   $scope.icon_hover = false;
 
   var ctrl = $scope;
@@ -28,29 +28,28 @@ app.controller('MainmenuCtrl', function($scope, $http, $window, $location, AuthS
     });
   };
   $scope.getleclist = function(name){
-    $http.get('http://127.0.0.1:8000/slides/lecture_list/a').success(function(data){
-     ctrl.lecture_list = eval(JSON.parse(data));
+    $http.get('http://127.0.0.1:8000/slides/lecture_list/'+course).success(function(data){
+     ctrl.lecture_list = eval(data);
     });
    };
   $scope.select_slide = function(pk){
-    // Derek: set database to save that this user picks this lecture(pk)
+    $http.get('http://127.0.0.1:8000/slides/select_lecture/'+pk).success(function(data){
+    });
     console.log('slide selected');
       // this will jump to another html section with another controller so it will not know about this pk
       $location.path('/lecture');
   }
 
-  $scope.course_list = [{'name':'cat'}, 
-                        {'name':'turtle'}, 
-                        {'name':'pizza'}];
+  $scope.course_list = []
   $scope.getcourses = function(){
     $http.get('http://127.0.0.1:8000/slides/course_list/').success(function(data){
-     ctrl.course_list = data.courses;
+     ctrl.course_list = eval(data);
     });
   }
   $scope.select_course = function(course){
     //TODO make api below
-    $http.get('http://127.0.0.1:8000/slides/select_course/'+course).success(function(data){
-     ctrl.lecture_list = data;
+    $http.get('http://127.0.0.1:8000/slides/lecture_list/'+course).success(function(data){
+     ctrl.lecture_list = eval(data);
     });
   }
 });
