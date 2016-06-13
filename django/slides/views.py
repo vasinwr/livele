@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate, login
 from .models import Current, PDF, Votes, PDFForm, Question, QuestionForm, Question_Vote
 from django.contrib.auth.models import User, Group
+from channels import Group as Channel_Group
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
@@ -207,6 +208,26 @@ def get_mood(request):
     
     return JsonResponse({'good': good*100/total, 'bad': bad*100/total})
 
+def send_mood(pdf, page):
+# sends mood status as percentages
+
+    good = Votes.objects.filter(pdf = pdf, page = page, value = 0).count()
+    bad = Votes.objects.filter(pdf = pdf, page = page, value = 1).count()
+    total = good + bad
+    if (total == 0):
+        total = 1
+        good = 1
+    
+    notification = {
+        "green_bar": good,
+        "red_bar": bad,
+    }
+    Channel_Group(str(pdf.pk)).send({
+       "type": 'bar',
+       "page": page,
+       "text": json.dumps(notification),
+    })
+
 
 
 @csrf_exempt
@@ -263,7 +284,8 @@ def vote_up(request):
         except Votes.DoesNotExist:
             v = Votes(user = request.token.user, pdf = current.pdf, page = current.page, value = 0)
         v.save()
-        v.send_notification(get_votes(request))
+        send_mood(current.pdf, current.page)
+
         return JsonResponse({'ack':True})
     else:
         pass
@@ -284,7 +306,8 @@ def vote_down(request):
         except Votes.DoesNotExist:
             v = Votes(user = request.token.user, pdf = current.pdf, page = current.page, value = 1)
         v.save()
-        v.send_notification(get_votes(request))
+        send_mood(current.pdf, current.page)
+
         return JsonResponse({'ack':True})
     else:
         pass    
