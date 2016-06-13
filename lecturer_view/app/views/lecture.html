@@ -2,17 +2,17 @@
     <!-- Top half -->
     <div class="Top-Half">
     
-      <div class="Left-Container" onclick="al()" ng-class="{'Side-Hover' : left_hover}" 
+      <div class="Left-Container" onclick="onPrevPage()" ng-class="{'Side-Hover' : left_hover}" 
                                   ng-mouseover="left_hover = true"
                                   ng-mouseleave="left_hover = false"
                                   ng-click="prev()">
         <div id="prev"><i class="fa fa-angle-left fa-2x" aria-hidden="true"></i></div>
       </div>
       <canvas id="pdfviewer"></canvas>
-      <div class="Right-Container" ng-class="{'Side-Hover' : right_hover}" 
+      <div class="Right-Container" onclick="onNextPage()" ng-class="{'Side-Hover' : right_hover}" 
                                   ng-mouseover="right_hover = true"
                                   ng-mouseleave="right_hover = false"
-                                  ng-click="next()">
+                                  >
         <div id="next"><i class="fa fa-angle-right fa-2x" aria-hidden="true"></i></div>
       </div>
 
@@ -136,51 +136,130 @@ var al = function al(){
   <script>
 var x = function(){alert(angular.element(document.getElementById('lecturer_view')).scope().clicked);};
   </script>
-    <!-- mousetrap control -->
-    <script>
-      Mousetrap.bind(['right','space'], al);
-      Mousetrap.bind('left', x);
-    </script>
 
-    <!-- pdfjs control -->
-    <script>
-      var url ='http://127.0.0.1:8000/slides/get_pdf/';
-      //window.open(url);
-      console.log(url);
-      var maxPages = 0;
-      var scale = 1.5;
-      var canvas = document.getElementById('pdfviewer');
-      var context = canvas.getContext('2d');
-      var viewport = 0;
-      var renderContext = 0;
-      var page_no = 1;
+      
+  <!-- pdf control -->
+  <script>
+  //
+  // If absolute URL from the remote server is provided, configure the CORS
+  // header on that server.
+  //
+  var url = 'http://127.0.0.1:8000/slides/get_pdf/';
+
+
+  //
+  // Disable workers to avoid yet another cross-origin issue (workers need
+  // the URL of the script to be loaded, and dynamically loading a cross-origin
+  // script does not work).
+  //
+  PDFJS.disableWorker = true;
+
+  //
+  // In cases when the pdf.worker.js is located at the different folder than the
+  // pdf.js's one, or the pdf.js is executed via eval(), the workerSrc property
+  // shall be specified.
+  //
+  // PDFJS.workerSrc = '../../build/pdf.worker.js';
+
+  var pdfDoc = null,
+      pageNum = 1,
+      pageRendering = false,
+      pageNumPending = null,
+      scale = 1.5,
+      canvas = document.getElementById('pdfviewer'),
+      ctx = canvas.getContext('2d');
 
       // adding token header to pdfjs request
       var docInitParams = new Object();
       docInitParams.url = url;
       docInitParams.httpHeaders = {"Authorization":"Token "+localStorage.getItem('token')};
-      
-      getPDF();
-      function getPDF() {
-        PDFJS.disableWorker = true;
-      //  PDFJS.workerSrc = "scripts/pdf.worker.js";
-        PDFJS.getDocument(docInitParams).then(function getPdfViewer(pdf) {
-          // Fetch the first page
-          maxPages = pdf.numPages;
-          pdf.getPage(page_no).then(function getPageViewer(page) {
-            viewport = page.getViewport(scale);
-            // Prepare canvas using PDF page dimensions
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-            // Render PDF page into canvas context
-            renderContext = {
-              canvasContext: context,
-              viewport: viewport
-            };
-            page.render(renderContext);
-          });
-      //    checkmax();
-        });
-      }
-  </script>
+
+  /**
+   * Get page info from document, resize canvas accordingly, and render page.
+   * @param num Page number.
+   */
+  function renderPage(num) {
+    pageRendering = true;
+    // Using promise to fetch the page
+    pdfDoc.getPage(num).then(function(page) {
+      var viewport = page.getViewport(scale);
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      // Render PDF page into canvas context
+      var renderContext = {
+        canvasContext: ctx,
+        viewport: viewport
+      };
+      var renderTask = page.render(renderContext);
+
+      // Wait for rendering to finish
+      renderTask.promise.then(function () {
+        pageRendering = false;
+        if (pageNumPending !== null) {
+          // New page rendering is pending
+          renderPage(pageNumPending);
+          pageNumPending = null;
+        }
+      });
+    });
+
+  }
+
+  /**
+   * If another page rendering in progress, waits until the rendering is
+   * finised. Otherwise, executes rendering immediately.
+   */
+  function queueRenderPage(num) {
+    if (pageRendering) {
+      pageNumPending = num;
+    } else {
+      renderPage(num);
+    }
+  }
+
+  /**
+   * Displays previous page.
+   */
+  function onPrevPage() {
+    if (pageNum <= 1) {
+      return;
+    }
+    pageNum--;
+    queueRenderPage(pageNum);
+  }
+  document.getElementById('prev').addEventListener('click', onPrevPage);
+
+  /**
+   * Displays next page.
+   */
+  function onNextPage() {
+    console.log('nex');
+    if (pageNum >= pdfDoc.numPages) {
+      return;
+    }
+    //pageNum++;
+    var scope = angular.element(document.getElementById('lecturer_view')).scope();
+  scope.$apply(function(){
+    scope.next();
+  });
+    pageNum= scope.page_num;
+    queueRenderPage(pageNum);
+  }
+
+  /**
+   * Asynchronously downloads PDF.
+   */
+  PDFJS.getDocument(docInitParams).then(function (pdfDoc_) {
+    pdfDoc = pdfDoc_;
+
+    // Initial/first page rendering
+    renderPage(pageNum);
+  });
+</script>
+    <!-- mousetrap control -->
+    <!--script>
+      Mousetrap.bind(['right','space'], onNextPage());
+      Mousetrap.bind('left', onPrevPage());
+    </script-->
 

@@ -38,14 +38,14 @@ app.controller('LectureCtrl', function($scope, $window, $location, $http){
 
     $http.get('http://127.0.0.1:8000/slides/lecture/go_prev_page/').success(function(data){
 
-     ctrl.page_num = data;
+     ctrl.page_num = data.page;
     });
   };
   $scope.next = function(){
     console.log('next')
     $http.get('http://127.0.0.1:8000/slides/lecture/go_next_page/').success(function(data){
      console.log('done')
-     ctrl.page_num = data;
+     ctrl.page_num = data.page;
     });
   };
 });
