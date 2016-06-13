@@ -1,4 +1,4 @@
-app.controller('LectureCtrl', function($scope, $window, $location){
+app.controller('LectureCtrl', function($scope, $window, $location, $http){
   if (!$window.localStorage.token) {
     $location.path('/');
     return;
@@ -13,6 +13,7 @@ app.controller('LectureCtrl', function($scope, $window, $location){
   $scope.navi_hover  =false ;
   $scope.home_hover  =false ;
   $scope.close_hover =false ;
+  $scope.page_num = 1;
   $scope.ques = [{question: 'what happens if I fail?', votes: 10}, 
                {question: 'are labs open on bank holiday', votes: 8},
                {question: 'what happened to our coke machine', votes: 3}];
@@ -32,5 +33,15 @@ app.controller('LectureCtrl', function($scope, $window, $location){
   $scope.click = function(summary){
     //TODO: summary received from websocket message 
     ctrl.clicked = true;
+  };
+  $scope.prev = function(){
+    $http.get('http://127.0.0.1:8000/slides/lecture/go_prev_page').success(function(data){
+     ctrl.page_num = data;
+    });
+  };
+  $scope.next = function(){
+    $http.get('http://127.0.0.1:8000/slides/lecture/go_next_page').success(function(data){
+     ctrl.page_num = data;
+    });
   };
 });

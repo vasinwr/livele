@@ -33,10 +33,10 @@ app.controller('MainmenuCtrl', function($scope, $http, $window, $location, AuthS
    };
   $scope.select_slide = function(pk){
     $http.get('http://127.0.0.1:8000/slides/select_lecture/'+pk).success(function(data){
-    });
-    console.log('slide selected');
       // this will jump to another html section with another controller so it will not know about this pk
       $location.path('/lecture');
+    });
+    console.log('slide selected');
   }
 
   $scope.course_list = []
