@@ -25,9 +25,13 @@ app.config(['$routeProvider','$httpProvider', function($routeProvider, $httpProv
       templateUrl: 'views/clicker.html',
       controller: 'ClickerCtrl'
     })
-    .when('/student', {
+    .when('/student_view', {
       templateUrl: 'views/student_view.html',
       controller: 'StudentViewCtrl'
+    })
+    .when('/student_mainmenu', {
+      templateUrl: 'views/student_mainmenu.html',
+      controller: 'StudentMainmenuCtrl'
     })
     .otherwise({
       redirectTo: '/'

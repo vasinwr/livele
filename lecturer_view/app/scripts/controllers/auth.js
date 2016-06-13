@@ -1,6 +1,6 @@
 'use strict';
 
-app.controller('AuthCtrl', function ($scope, $location, AuthService) {
+app.controller('AuthCtrl', function ($scope, $location, $window, AuthService) {
   $scope.register = function () {
     var username = $scope.registerUsername;
     var password = $scope.registerPassword;
@@ -26,7 +26,11 @@ app.controller('AuthCtrl', function ($scope, $location, AuthService) {
     if (username && password) {
       AuthService.login(username, password).then(
         function () {
-          $location.path('/mainmenu');
+          if($window.localStorage.user_is_lec == 1){
+            $location.path('/mainmenu');
+          } else if($window.localStorage.user_is_lec == 0){
+            $location.path('/student_mainmenu');
+          }
         },
         function (error) {
           $scope.loginError = error;

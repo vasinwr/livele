@@ -3,6 +3,10 @@ app.controller('LectureCtrl', function($scope, $window, $location, $http){
     $location.path('/');
     return;
   }
+  if ($window.localStorage.user_is_lect != 1) {
+    $location.path('/');
+    return;
+  }
   $scope.left_hover = false; 
   $scope.right_hover = false;
 
