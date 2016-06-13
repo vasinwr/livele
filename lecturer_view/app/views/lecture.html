@@ -5,7 +5,7 @@
       <div class="Left-Container" onclick="onPrevPage()" ng-class="{'Side-Hover' : left_hover}" 
                                   ng-mouseover="left_hover = true"
                                   ng-mouseleave="left_hover = false"
-                                  ng-click="prev()">
+                                  >
         <div id="prev"><i class="fa fa-angle-left fa-2x" aria-hidden="true"></i></div>
       </div>
       <canvas id="pdfviewer"></canvas>
@@ -15,12 +15,6 @@
                                   >
         <div id="next"><i class="fa fa-angle-right fa-2x" aria-hidden="true"></i></div>
       </div>
-
-  <div id="extras" style="position:absolute; bottom:0px; right:0px; border-style:dotted;">
-
-    {{ page_num }} <br>
-
-  </div>
 
     </div>
 
@@ -225,26 +219,32 @@ var x = function(){alert(angular.element(document.getElementById('lecturer_view'
     if (pageNum <= 1) {
       return;
     }
-    pageNum--;
-    queueRenderPage(pageNum);
+    var scope = angular.element(document.getElementById('lecturer_view')).scope();
+  scope.$apply(function(){
+      scope.prev().success(function(data){
+       pageNum = data.page
+       queueRenderPage(pageNum);
+       console.log('prev');
+      });
+  });
   }
-  document.getElementById('prev').addEventListener('click', onPrevPage);
 
   /**
    * Displays next page.
    */
   function onNextPage() {
-    console.log('nex');
+
     if (pageNum >= pdfDoc.numPages) {
       return;
     }
-    //pageNum++;
     var scope = angular.element(document.getElementById('lecturer_view')).scope();
   scope.$apply(function(){
-    scope.next();
+      scope.next().success(function(data){
+       pageNum = data.page
+       queueRenderPage(pageNum);
+       console.log('next');
+      });
   });
-    pageNum= scope.page_num;
-    queueRenderPage(pageNum);
   }
 
   /**
@@ -252,8 +252,6 @@ var x = function(){alert(angular.element(document.getElementById('lecturer_view'
    */
   PDFJS.getDocument(docInitParams).then(function (pdfDoc_) {
     pdfDoc = pdfDoc_;
-
-    // Initial/first page rendering
     renderPage(pageNum);
   });
 </script>
