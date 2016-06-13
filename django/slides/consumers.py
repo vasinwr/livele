@@ -4,7 +4,7 @@ from .models import Token, PDF, Current
 #connected to websocket.connect channel
 def ws_add(message, token):
     user = Token.objects.get(token = token).user
-    groupname = str(Current.objects.get(owner=user, active=1).pdf)
+    groupname = str(Current.objects.get(owner=user, active=1).pdf.pk)
     print(user.username + " added to group " + groupname)
     Group(groupname).add(message.reply_channel)
 

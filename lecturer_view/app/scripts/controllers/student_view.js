@@ -1,4 +1,4 @@
-app.controller('StudentViewCtrl', function($scope, $window, $location){
+app.controller('StudentViewCtrl', function($scope, $window, $location, $http){
   if (!$window.localStorage.token) {
     $location.path('/');
     return;
@@ -24,10 +24,21 @@ app.controller('StudentViewCtrl', function($scope, $window, $location){
     //upvote(index) <--upvote question in database
   };
 
-
-  $scope.happy = false; //functions for votes
-  //is it ^ or $scope.happy = function() {}
-  $scope.unhappy = false;
+  $scope.happy = function(){
+    return $http.get('http://127.0.0.1:8000/slides/lecture/vote_up/');
+  };
+  $scope.unhappy = function(){
+    return $http.get('http://127.0.0.1:8000/slides/lecture/vote_down/');
+  };
+  $scope.get_mood = function(){
+    return $http.get('http://127.0.0.1:8000/slides/lecture/get_mood/');
+  };
+  $scope.prev = function(){
+    return $http.get('http://127.0.0.1:8000/slides/lecture/go_prev_page/');
+  };
+  $scope.next = function(){
+    return $http.get('http://127.0.0.1:8000/slides/lecture/go_next_page/');
+  };
   $scope.fast = false;
   $scope.slow = false;
 });

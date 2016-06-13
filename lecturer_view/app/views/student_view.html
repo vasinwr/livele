@@ -1,13 +1,14 @@
 <link rel="stylesheet" href="styles/student_view.css">
-
+<div id="student_view" ng-controller="StudentViewCtrl">
     <!-- Top half -->
-    <div class="row">
+    <div class="row" ng-init="get_mood()">
       <div class="col-lg-6">
         <canvas id="pdfviewer"></canvas>
         <div class="Buttons">
           <div class="Left-Button" ng-class="{'Side-Hover' : sides.left_hover}" 
                                    ng-mouseover="sides.left_hover = true"
-                                   ng-mouseleave="sides.left_hover = false">
+                                   ng-mouseleave="sides.left_hover = false"
+                                   onclick="onPrevPage()">
             <div id="prev"><i class="fa fa-angle-left fa-2x" aria-hidden="true"></i></div>
           </div>
           <div class="Middle-Button" ng-click="current"> 
@@ -15,13 +16,14 @@
           </div>
           <div class="Right-Button" ng-class="{'Side-Hover' : sides.right_hover}" 
                                     ng-mouseover="sides.right_hover = true"
-                                    ng-mouseleave="sides.right_hover = false">
+                                    ng-mouseleave="sides.right_hover = false"
+                                    onclick="onNextPage()">
             <div id="next"><i class="fa fa-angle-right fa-2x" aria-hidden="true"></i></div>
           </div>
         </div>
         <div class="Vote-Buttons">
-          <button ng-click="happy"><i class="fa fa-smile-o fa-3x" aria-hidden="true"></i></button>
-          <button ng-click="unhappy"><i class="fa fa-frown-o fa-3x" aria-hidden="true"></i></button>
+          <button ng-click="happy()"><i class="fa fa-smile-o fa-3x" aria-hidden="true"></i></button>
+          <button ng-click="unhappy()"><i class="fa fa-frown-o fa-3x" aria-hidden="true"></i></button>
           <button ng-click="fast">Too Slow</button>
           <button ng-click="slow">Too Fast</button>
         </div>
@@ -49,11 +51,11 @@
         </form>
       </div>
     </div>
-
+</div>
     <!-- websocket control -->
     <script>
       console.log('websocket.js used');
-      var socket = new WebSocket('ws://127.0.0.1:8000/all/');
+      var socket = new WebSocket('ws://127.0.0.1:8000/user/'+localStorage.getItem('token')+'/');
       socket.onmessage = function(message){
         var data = JSON.parse(message.data);
         if(data.type == 'bar'){
@@ -64,38 +66,128 @@
       }
     </script>
 
-    <!-- pdfjs control -->
-    <script>
-      var url ='http://127.0.0.1:8000/slides/get_pdf';
-      //window.open(url);
-      console.log(url);
-      var maxPages = 0;
-      var scale = 1.5;
-      var canvas = document.getElementById('pdfviewer');
-      var context = canvas.getContext('2d');
-      var viewport = 0;
-      var renderContext = 0;
-      var page_no = 1;
-      getPDF();
-      function getPDF() {
-        PDFJS.disableWorker = true;
-      //  PDFJS.workerSrc = "scripts/pdf.worker.js";
-        PDFJS.getDocument(url).then(function getPdfViewer(pdf) {
-          // Fetch the first page
-          maxPages = pdf.numPages;
-          pdf.getPage(page_no).then(function getPageViewer(page) {
-            viewport = page.getViewport(scale);
-            // Prepare canvas using PDF page dimensions
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-            // Render PDF page into canvas context
-            renderContext = {
-              canvasContext: context,
-              viewport: viewport
-            };
-            page.render(renderContext);
-          });
-      //    checkmax();
-        });
-      }
-  </script>
+
+  <!-- pdf control -->
+  <script>
+  //
+  // If absolute URL from the remote server is provided, configure the CORS
+  // header on that server.
+  //
+  var url = 'http://127.0.0.1:8000/slides/get_pdf/';
+
+
+  //
+  // Disable workers to avoid yet another cross-origin issue (workers need
+  // the URL of the script to be loaded, and dynamically loading a cross-origin
+  // script does not work).
+  //
+  PDFJS.disableWorker = true;
+
+  //
+  // In cases when the pdf.worker.js is located at the different folder than the
+  // pdf.js's one, or the pdf.js is executed via eval(), the workerSrc property
+  // shall be specified.
+  //
+  // PDFJS.workerSrc = '../../build/pdf.worker.js';
+
+  var pdfDoc = null,
+      pageNum = 1,
+      pageRendering = false,
+      pageNumPending = null,
+      scale = 1.5,
+      canvas = document.getElementById('pdfviewer'),
+      ctx = canvas.getContext('2d');
+
+      // adding token header to pdfjs request
+      var docInitParams = new Object();
+      docInitParams.url = url;
+      docInitParams.httpHeaders = {"Authorization":"Token "+localStorage.getItem('token')};
+
+  /**
+   * Get page info from document, resize canvas accordingly, and render page.
+   * @param num Page number.
+   */
+  function renderPage(num) {
+    pageRendering = true;
+    // Using promise to fetch the page
+    pdfDoc.getPage(num).then(function(page) {
+      var viewport = page.getViewport(scale);
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      // Render PDF page into canvas context
+      var renderContext = {
+        canvasContext: ctx,
+        viewport: viewport
+      };
+      var renderTask = page.render(renderContext);
+
+      // Wait for rendering to finish
+      renderTask.promise.then(function () {
+        pageRendering = false;
+        if (pageNumPending !== null) {
+          // New page rendering is pending
+          renderPage(pageNumPending);
+          pageNumPending = null;
+        }
+      });
+    });
+
+  }
+
+  /**
+   * If another page rendering in progress, waits until the rendering is
+   * finised. Otherwise, executes rendering immediately.
+   */
+  function queueRenderPage(num) {
+    if (pageRendering) {
+      pageNumPending = num;
+    } else {
+      renderPage(num);
+    }
+  }
+
+  /**
+   * Displays previous page.
+   */
+  function onPrevPage() {
+    if (pageNum <= 1) {
+      return;
+    }
+    var scope = angular.element(document.getElementById('student_view')).scope();
+  scope.$apply(function(){
+      scope.prev().success(function(data){
+       pageNum = data.page
+       queueRenderPage(pageNum);
+       console.log('prev');
+      });
+  });
+  }
+
+  /**
+   * Displays next page.
+   */
+  function onNextPage() {
+
+    if (pageNum >= pdfDoc.numPages) {
+      return;
+    }
+    var scope = angular.element(document.getElementById('student_view')).scope();
+  scope.$apply(function(){
+      scope.next().success(function(data){
+       pageNum = data.page
+       queueRenderPage(pageNum);
+       console.log('next');
+      });
+  });
+  }
+
+  /**
+   * Asynchronously downloads PDF.
+   */
+  PDFJS.getDocument(docInitParams).then(function (pdfDoc_) {
+    pdfDoc = pdfDoc_;
+    renderPage(pageNum);
+  });
+</script>
+
