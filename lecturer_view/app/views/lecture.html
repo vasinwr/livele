@@ -114,6 +114,17 @@ var al = function al(){
       socket.onmessage = function(message){
         var scope = angular.element(document.getElementById('lecturer_view')).scope();
         var data = JSON.parse(message.data);
+        if(data.type == 'nav'){
+          if(data.nav == 'next'){
+            onNextPage();
+          } else if(data.nav == 'back'){
+            onPrevPage();
+          } else if(data.nav == 'menu'){
+            scope.$apply(function(){
+              scope.clicked = true;
+            };
+          }
+        }
         if(data.type == 'bar'){
           document.getElementById('red_bar').style.width = data.red_bar + '%';
           document.getElementById('green_bar').style.width = data.green_bar + '%';
