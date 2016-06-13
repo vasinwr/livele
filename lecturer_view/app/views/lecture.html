@@ -109,6 +109,7 @@ var al = function al(){
     scope.click('x');
   });
 }
+
     </script>
     <!-- websocket control -->
     <script>
@@ -132,11 +133,13 @@ var al = function al(){
         }
       }
     </script>
-
+  <script>
+var x = function(){alert(angular.element(document.getElementById('lecturer_view')).scope().clicked);};
+  </script>
     <!-- mousetrap control -->
     <script>
       Mousetrap.bind(['right','space'], al);
-      Mousetrap.bind('left', function() { alert('previous page') });
+      Mousetrap.bind('left', x);
     </script>
 
     <!-- pdfjs control -->
@@ -180,3 +183,4 @@ var al = function al(){
         });
       }
   </script>
+
