@@ -3,6 +3,10 @@ app.controller('LectureCtrl', function($scope, $window, $location, $http){
     $location.path('/');
     return;
   }
+  if ($window.localStorage.user_is_lec != 1) {
+    $location.path('/');
+    return;
+  }
   $scope.left_hover = false; 
   $scope.right_hover = false;
 
@@ -39,4 +43,7 @@ app.controller('LectureCtrl', function($scope, $window, $location, $http){
   $scope.next = function(){
     return $http.get('http://127.0.0.1:8000/slides/lecture/go_next_page/')
   };
+  $scope.goto_questions = function (){
+    $location.path('/questions');
+  }
 });

@@ -1,9 +1,9 @@
-app.controller('MainmenuCtrl', function($scope, $http, $window, $location, AuthService){
+app.controller('StudentMainmenuCtrl', function($scope, $window, $location, $http, AuthService){
   if (!$window.localStorage.token) {
     $location.path('/');
     return;
   }
-  if ($window.localStorage.user_is_lec != 1) {
+  if ($window.localStorage.user_is_lec != 0) {
     $location.path('/');
     return;
   }
@@ -38,7 +38,7 @@ app.controller('MainmenuCtrl', function($scope, $http, $window, $location, AuthS
   $scope.select_slide = function(pk){
     $http.get('http://127.0.0.1:8000/slides/select_lecture/'+pk).success(function(data){
       // this will jump to another html section with another controller so it will not know about this pk
-      $location.path('/lecture');
+      $location.path('/student_view');
     });
     console.log('slide selected');
   }
@@ -55,5 +55,8 @@ app.controller('MainmenuCtrl', function($scope, $http, $window, $location, AuthS
      ctrl.lecture_list = eval(data);
     });
   }
+
 });
+
+
 

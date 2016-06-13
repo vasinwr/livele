@@ -14,10 +14,13 @@ app.factory('AuthService', function ($http, $q , $window , API_SERVER) {
       function (response) {
         var token = response.data.token;
         var username = response.data.username;
+
+        var user_is_lec = response.data.user_is_lec;
     
         if (token && username) {
           $window.localStorage.token = token;
           $window.localStorage.username = username;
+          $window.localStorage.user_is_lec = user_is_lec;
           deferred.resolve(true);
         } else {
           deferred.reject('Invalid data received from server');
@@ -38,6 +41,7 @@ app.factory('AuthService', function ($http, $q , $window , API_SERVER) {
       function () {
         $window.localStorage.removeItem('token');
         $window.localStorage.removeItem('username');
+        $window.localStorage.removeItem('user_is_lec');
         deferred.resolve();
       },
       function (error) {
@@ -58,5 +62,6 @@ app.factory('AuthService', function ($http, $q , $window , API_SERVER) {
       return logout();
     }
   };
+
 
 });

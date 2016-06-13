@@ -60,7 +60,9 @@
           </div>
         </div>
         <div id="menu-popup-ques-container" ng-mouseover="ques_hover=true"
-                                          ng-mouseleave="ques_hover=false">
+                                          ng-mouseleave="ques_hover=false"
+                                          ng-click="goto_questions()">
+          
           <div id="menu-popup-ques-inner" ng-class="{'menu-ques-hover': !ques_hover}">
             <p class="lead bigger-font"><u>questions</u></p>
             <p class="lead normal-font">{{ ques[0].question }} - {{ ques[0].votes }} <i class="fa fa-thumbs-up" aria-hidden="true"></i> </p>

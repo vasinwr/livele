@@ -403,7 +403,8 @@ def login(request):
                     token, created = Token.objects.get_or_create(user=user)
                     return json_response({
                         'token': token.token,
-                        'username': user.username
+                        'username': user.username,
+                        'user_is_lec': user.groups.filter(name = 'Lecturer').count()
                     })
                 else:
                     return json_response({

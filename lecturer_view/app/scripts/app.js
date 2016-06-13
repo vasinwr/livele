@@ -21,13 +21,21 @@ app.config(['$routeProvider','$httpProvider', function($routeProvider, $httpProv
       templateUrl: 'views/lecture.html',
       controller: 'LectureCtrl'
     })
+    .when('/questions', {
+      templateUrl: 'views/questions.html',
+      controller: 'questionCtrl'
+    })
     .when('/clicker', {
       templateUrl: 'views/clicker.html',
       controller: 'ClickerCtrl'
     })
-    .when('/student', {
+    .when('/student_view', {
       templateUrl: 'views/student_view.html',
       controller: 'StudentViewCtrl'
+    })
+    .when('/student_mainmenu', {
+      templateUrl: 'views/student_mainmenu.html',
+      controller: 'StudentMainmenuCtrl'
     })
     .otherwise({
       redirectTo: '/'
