@@ -319,13 +319,17 @@ def vote_down(request):
 def question(request):
 # user asks a question on his current slide. 
 # returns true if question asked, false otherwise.
+
     current = get_object_or_404(Current, owner = request.token.user, active=1)
+    ques = None
+    if request.method == 'POST':
+        ques = request.body
 
     if (current.pdf.current_page >= current.page):
-        dummy = Question(user = request.token.user, pdf = current.pdf, page = current.page, text = "")
+        dummy = Question(user = request.token.user, pdf = current.pdf, page = current.page, text = ques)
         dummy.save()
-        question = QuestionForm(request.POST, instance = dummy)
-        question.save()
+#        question = QuestionForm(request.POST, instance = dummy)
+#        question.save()
         return JsonResponse({'ack':True})
     else:
         pass
