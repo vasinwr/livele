@@ -113,7 +113,7 @@ var al = function al(){
     <!-- websocket control -->
     <script>
       console.log('websocket.js used');
-      var socket = new WebSocket('ws://127.0.0.1:8000/all/');
+      var socket = new WebSocket('ws://127.0.0.1:8000/user/'+localStorage.getItem('token')+'/');
       socket.onmessage = function(message){
         var data = JSON.parse(message.data);
         if(data.type == 'bar'){
