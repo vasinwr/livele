@@ -99,7 +99,8 @@ gulp.task('serve', ['styles', 'scripts', 'fonts'], () => {
       routes: {
         '/bower_components': 'bower_components'
       }
-    }
+    },
+    ghostMode: false
   });
 
   gulp.watch([
@@ -135,7 +136,7 @@ gulp.task('serve:test', ['scripts'], () => {
         '/scripts': '.tmp/scripts',
         '/bower_components': 'bower_components'
       }
-    }
+    },
   });
 
   gulp.watch('app/scripts/**/*.js', ['scripts']);

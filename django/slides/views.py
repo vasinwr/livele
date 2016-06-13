@@ -219,12 +219,12 @@ def send_mood(pdf, page):
         good = 1
     
     notification = {
-        "green_bar": good,
-        "red_bar": bad,
+        "type": 'bar',
+        "page": page,
+        "green_bar": good*100/total,
+        "red_bar": bad*100/total,
     }
     Channel_Group(str(pdf.pk)).send({
-       "type": 'bar',
-       "page": page,
        "text": json.dumps(notification),
     })
 
