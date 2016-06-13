@@ -25,6 +25,10 @@ app.config(['$routeProvider','$httpProvider', function($routeProvider, $httpProv
       templateUrl: 'views/questions.html',
       controller: 'questionCtrl'
     })
+    .when('/clicker_login', {
+      templateUrl: 'views/clicker_login.html',
+      controller: 'ClickerLoginCtrl'
+    })
     .when('/clicker', {
       templateUrl: 'views/clicker.html',
       controller: 'ClickerCtrl'
