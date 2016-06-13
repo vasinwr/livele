@@ -10,6 +10,10 @@ urlpatterns = [
     url(r'^api/login/$', views.login),
     url(r'^api/logout/$', views.logout),
     
+    url(r'^clicker_next/', views.clicker_next),
+    url(r'^clicker_prev/', views.clicker_prev),
+    url(r'^clicker_menu/', views.clicker_menu),
+
     url(r'^getpdf/', views.pdf_view),
     url(r'^returnsomejson/', views.returnsomejson),
 #    url(r'^profile/', views.index),

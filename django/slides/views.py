@@ -22,6 +22,50 @@ from .models import Token
 
 # Create your views here.
 
+@csrf_exempt
+@token_required
+def clicker_next(request):
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
+    pdf = current.pdf
+    notification = {
+        "type": 'nav',
+        "nav": 'next',
+    }
+    Channel_Group(str(pdf.pk)).send({
+       "text": json.dumps(notification),
+    })
+    return JsonResponse({'ack':False})
+
+@csrf_exempt
+@token_required
+def clicker_prev(request):
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
+    pdf = current.pdf
+    notification = {
+        "type": 'nav',
+        "nav": 'prev',
+    }
+    Channel_Group(str(pdf.pk)).send({
+       "text": json.dumps(notification),
+    })
+    return JsonResponse({'ack':False})
+
+@csrf_exempt
+@token_required
+def clicker_menu(request):
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
+    pdf = current.pdf
+    notification = {
+        "type": 'nav',
+        "nav": 'menu',
+    }
+    Channel_Group(str(pdf.pk)).send({
+       "text": json.dumps(notification),
+    })
+    return JsonResponse({'ack':False})
+
+
+
 def pdf_view(request):
     print (os.path.join(settings.MEDIA_ROOT, 'Backpropagation.pdf'))
     with open(os.path.join(settings.MEDIA_ROOT,'slides.pdf') ,'rb') as pdf:

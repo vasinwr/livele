@@ -117,12 +117,12 @@ var al = function al(){
         if(data.type == 'nav'){
           if(data.nav == 'next'){
             onNextPage();
-          } else if(data.nav == 'back'){
+          } else if(data.nav == 'prev'){
             onPrevPage();
           } else if(data.nav == 'menu'){
             scope.$apply(function(){
-              scope.clicked = true;
-            };
+              scope.clicked = !scope.clicked;
+            });
           }
         }
         if(data.type == 'bar'){
