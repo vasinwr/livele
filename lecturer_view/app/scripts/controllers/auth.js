@@ -51,4 +51,8 @@ app.controller('AuthCtrl', function ($scope, $location, $window, AuthService) {
       }
     );
   };
+
+  $scope.to_clicker = function () {
+    $location.path('/clicker_login');
+  };
 });
