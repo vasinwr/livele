@@ -3,7 +3,7 @@ app.controller('LectureCtrl', function($scope, $window, $location, $http){
     $location.path('/');
     return;
   }
-  if ($window.localStorage.user_is_lect != 1) {
+  if ($window.localStorage.user_is_lec != 1) {
     $location.path('/');
     return;
   }
@@ -52,4 +52,7 @@ app.controller('LectureCtrl', function($scope, $window, $location, $http){
      ctrl.page_num = data.page;
     });
   };
+  $scope.goto_questions = function (){
+    $location.path('/questions');
+  }
 });

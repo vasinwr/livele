@@ -3,7 +3,7 @@ app.controller('StudentMainmenuCtrl', function($scope, $window, $location, $http
     $location.path('/');
     return;
   }
-  if ($window.localStorage.user_is_lect != 0) {
+  if ($window.localStorage.user_is_lec != 0) {
     $location.path('/');
     return;
   }

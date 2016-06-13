@@ -3,7 +3,7 @@ app.controller('MainmenuCtrl', function($scope, $http, $window, $location, AuthS
     $location.path('/');
     return;
   }
-  if ($window.localStorage.user_is_lect != 1) {
+  if ($window.localStorage.user_is_lec != 1) {
     $location.path('/');
     return;
   }
