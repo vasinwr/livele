@@ -15,8 +15,12 @@ app.controller('StudentViewCtrl', function($scope, $window, $location, $http){
                {question: 'Question 2', votes: 8},
                {question: 'Question 3', votes: 3}];
 
+  $scope.question = ""
+  
   $scope.addQuestion = function() {
-    //function to add Question to database
+    $http.post('http://127.0.0.1:8000/slides/lecture/question/', $scope.question).success(function(data){
+
+    });
     $scope.question = '';
   };
 
