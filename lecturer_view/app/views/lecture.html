@@ -112,6 +112,7 @@ var al = function al(){
       console.log('websocket.js used');
       var socket = new WebSocket('ws://127.0.0.1:8000/user/'+localStorage.getItem('token')+'/');
       socket.onmessage = function(message){
+        var scope = angular.element(document.getElementById('lecturer_view')).scope();
         var data = JSON.parse(message.data);
         if(data.type == 'bar'){
           document.getElementById('red_bar').style.width = data.red_bar + '%';
@@ -119,7 +120,6 @@ var al = function al(){
         }
         if(data.type == 'question'){
           // call controller function: update_question(data.questions)
-          var scope = angular.element(document.getElementById('lecturer_view')).scope();
           scope.$apply(function(){
             scope.update_question(data.questions);
           });
