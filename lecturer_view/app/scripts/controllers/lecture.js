@@ -35,12 +35,16 @@ app.controller('LectureCtrl', function($scope, $window, $location, $http){
     ctrl.clicked = true;
   };
   $scope.prev = function(){
-    $http.get('http://127.0.0.1:8000/slides/lecture/go_prev_page').success(function(data){
+
+    $http.get('http://127.0.0.1:8000/slides/lecture/go_prev_page/').success(function(data){
+
      ctrl.page_num = data;
     });
   };
   $scope.next = function(){
-    $http.get('http://127.0.0.1:8000/slides/lecture/go_next_page').success(function(data){
+    console.log('next')
+    $http.get('http://127.0.0.1:8000/slides/lecture/go_next_page/').success(function(data){
+     console.log('done')
      ctrl.page_num = data;
     });
   };
