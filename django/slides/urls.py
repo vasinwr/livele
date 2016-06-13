@@ -36,6 +36,7 @@ urlpatterns = [
     url(r'^lecture/question/', views.question, name='question'),
     url(r'^lecture/qvote/([a-zA-Z0-9_]+)', views.qvote, name='qvote'),
     url(r'^lecture/show_questions/', views.show_questions, name='show questions'),
+    url(r'^trigger_anything/', views.trigger_anything, name='trigger anything'),
     #lecture/ must be at the bottom otherwise it will always be matched first
 #    url(r'^lecture/', views.lecture, name='lecture'),
 ]

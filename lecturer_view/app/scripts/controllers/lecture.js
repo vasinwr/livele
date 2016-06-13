@@ -17,14 +17,14 @@ app.controller('LectureCtrl', function($scope, $window, $location, $http){
   $scope.navi_hover  =false ;
   $scope.home_hover  =false ;
   $scope.close_hover =false ;
-  $scope.ques = [{question: 'what happens if I fail?', votes: 10}, 
-               {question: 'are labs open on bank holiday', votes: 8},
-               {question: 'what happened to our coke machine', votes: 3}];
+  $scope.ques = [];
 
   var ctrl = $scope;
-  $scope.update_question = function(questions){
-    //TODO: questions received from websocket message (top 3 questions)
-    ctrl.ques = questions;
+  $scope.update_question = function(){
+    console.log('update q called')
+    $http.get('http://127.0.0.1:8000/slides/lecture/show_questions/').success(function(data){
+      ctrl.ques = eval(data)
+    });
   };
   $scope.update_summary = function(summary){
     //TODO: summary received from websocket message 

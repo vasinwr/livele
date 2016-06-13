@@ -13,7 +13,9 @@ from django.db.models import Count
 #from .forms import PDFForm
 import os
 import json
-from django.core import serializers 
+from django.core import serializers
+from django.core.serializers.json import DjangoJSONEncoder
+
 
 from .utils import json_response, token_required
 from django.views.decorators.csrf import csrf_exempt
@@ -28,7 +30,7 @@ def clicker_next(request):
     current = get_object_or_404(Current, owner = request.token.user, active=1)
     pdf = current.pdf
     notification = {
-        "type": 'nav',
+        "type": 'clicker',
         "nav": 'next',
     }
     Channel_Group(str(pdf.pk)).send({
@@ -42,7 +44,7 @@ def clicker_prev(request):
     current = get_object_or_404(Current, owner = request.token.user, active=1)
     pdf = current.pdf
     notification = {
-        "type": 'nav',
+        "type": 'clicker',
         "nav": 'prev',
     }
     Channel_Group(str(pdf.pk)).send({
@@ -56,7 +58,7 @@ def clicker_menu(request):
     current = get_object_or_404(Current, owner = request.token.user, active=1)
     pdf = current.pdf
     notification = {
-        "type": 'nav',
+        "type": 'clicker',
         "nav": 'menu',
     }
     Channel_Group(str(pdf.pk)).send({
@@ -282,9 +284,16 @@ def go_next_page(request):
     current = get_object_or_404(Current, owner = request.token.user, active=1)
     current.page +=1
     current.save()
-    if(request.token.user.groups.filter(name = 'Lecturer').count() == 1):
+    if(request.token.user == current.pdf.lecturer):
         current.pdf.current_page = current.page
         current.pdf.save()
+        notification = {
+            "type": 'nav',
+            "nav": 'next',
+        }
+        Channel_Group(str(current.pdf.pk)).send({
+           "text": json.dumps(notification),
+        })
     return JsonResponse({'page':current.page})
 
 
@@ -297,9 +306,16 @@ def go_prev_page(request):
     if (current.page > 1):
         current.page -= 1
         current.save()
-        if(request.token.user.groups.filter(name = 'Lecturer').count() == 1):
-            current.pdf.current_page -= 1
-            current.pdf.save()
+        if(request.token.user == current.pdf.lecturer):
+          current.pdf.current_page = current.page
+          current.pdf.save()
+          notification = {
+              "type": 'nav',
+              "nav": 'prev',
+          }
+          Channel_Group(str(current.pdf.pk)).send({
+             "text": json.dumps(notification),
+          })
     return JsonResponse({'page':current.page})
 
 
@@ -370,6 +386,12 @@ def question(request):
         dummy.save()
         question = QuestionForm(request.POST, instance = dummy)
         question.save()
+        notification = {
+            "type": 'question',
+        }
+        Channel_Group(str(current.pdf.pk)).send({
+            "text": json.dumps(notification),
+        })
         return JsonResponse({'ack':True})
     else:
         pass
@@ -400,9 +422,21 @@ def show_questions(request):
     current = get_object_or_404(Current, owner = request.token.user, active=1)
 
     curr_qs = Question.objects.filter(pdf = current.pdf)
-    displayQ = serializers.serialize("json", curr_qs.annotate(votes = Count('question_vote')).order_by('-votes'))
+    qs = curr_qs.annotate(votes = Count('question_vote')).order_by('-votes').values()
+    displayQ = json.dumps(list(qs), cls=DjangoJSONEncoder)
 
-    return JsonResponse({'questions':displayQ}, safe=False)
+    return JsonResponse(displayQ, safe=False)
+
+@csrf_exempt
+def trigger_anything(request):
+    pdf = PDF.objects.get(filename = "CH1")
+    notification = {
+        "type": 'question',
+    }
+    Channel_Group(str(pdf.pk)).send({
+        "text": json.dumps(notification),
+    })
+    return JsonResponse({'fucking':'piece of shit'})
 
 
 

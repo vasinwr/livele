@@ -1,4 +1,4 @@
-<div id="lecturer_view" ng-controller="LectureCtrl">
+<div id="lecturer_view" ng-controller="LectureCtrl" ng-init="update_question()">
     <!-- Top half -->
     <div class="Top-Half">
     
@@ -65,9 +65,9 @@
           
           <div id="menu-popup-ques-inner" ng-class="{'menu-ques-hover': !ques_hover}">
             <p class="lead bigger-font"><u>questions</u></p>
-            <p class="lead normal-font">{{ ques[0].question }} - {{ ques[0].votes }} <i class="fa fa-thumbs-up" aria-hidden="true"></i> </p>
-            <p class="lead normal-font">{{ ques[1].question }} - {{ ques[1].votes}} <i class="fa fa-thumbs-up" aria-hidden="true"></i> </p>
-            <p class="lead normal-font">{{ ques[2].question }} - {{ ques[2].votes}} <i class="fa fa-thumbs-up" aria-hidden="true"></i> </p>
+            <p class="lead normal-font">On page {{ques[0].page}}, {{ ques[0].text }} - {{ ques[0].votes }} <i class="fa fa-thumbs-up" aria-hidden="true"></i> </p>
+            <p class="lead normal-font">On page {{ques[1].page}}, {{ ques[1].text }} - {{ ques[1].votes }} <i class="fa fa-thumbs-up" aria-hidden="true"></i> </p>
+            <p class="lead normal-font">On page {{ques[2].page}}, {{ ques[2].text }} - {{ ques[2].votes }} <i class="fa fa-thumbs-up" aria-hidden="true"></i> </p>
             <p class="lead normal-font"> ... </p>
           </div>
         </div>
@@ -114,7 +114,7 @@ var al = function al(){
       socket.onmessage = function(message){
         var scope = angular.element(document.getElementById('lecturer_view')).scope();
         var data = JSON.parse(message.data);
-        if(data.type == 'nav'){
+        if(data.type == 'clicker'){
           if(data.nav == 'next'){
             onNextPage();
           } else if(data.nav == 'prev'){
@@ -130,13 +130,16 @@ var al = function al(){
           document.getElementById('green_bar').style.width = data.green_bar + '%';
         }
         if(data.type == 'question'){
-          // call controller function: update_question(data.questions)
+          // call controller function: update_question()
           scope.$apply(function(){
-            scope.update_question(data.questions);
+            scope.update_question();
           });
         }
         if(data.type == 'summary'){
           // call controller function: update_summary(data.summary)
+        }
+        if(data.type == 'nav'){
+          // ignore
         }
       }
     </script>
