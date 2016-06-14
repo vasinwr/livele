@@ -240,6 +240,10 @@ var x = function(){alert(angular.element(document.getElementById('lecturer_view'
       scope.prev().success(function(data){
        pageNum = data.page
        queueRenderPage(pageNum);
+        scope.get_mood().success(function(data){
+            document.getElementById('red_bar').style.width = data.bad + '%';
+            document.getElementById('green_bar').style.width = data.good + '%';
+        });
        console.log('prev');
       });
   });
@@ -258,6 +262,10 @@ var x = function(){alert(angular.element(document.getElementById('lecturer_view'
       scope.next().success(function(data){
        pageNum = data.page
        queueRenderPage(pageNum);
+        scope.get_mood().success(function(data){
+            document.getElementById('red_bar').style.width = data.bad + '%';
+            document.getElementById('green_bar').style.width = data.good + '%';
+        });
        console.log('next');
       });
   });
@@ -268,7 +276,19 @@ var x = function(){alert(angular.element(document.getElementById('lecturer_view'
    */
   PDFJS.getDocument(docInitParams).then(function (pdfDoc_) {
     pdfDoc = pdfDoc_;
-    renderPage(pageNum);
+    var scope = angular.element(document.getElementById('lecturer_view')).scope();
+    scope.$apply(function(){
+      scope.curr().success(function(data){
+       pageNum = data.page
+       renderPage(pageNum);
+       console.log('init page = '+ pageNum);
+        scope.get_mood().success(function(data){
+            document.getElementById('red_bar').style.width = data.bad + '%';
+            document.getElementById('green_bar').style.width = data.good + '%';
+        });
+       console.log('init');
+      });
+    });
   });
 </script>
     <!-- mousetrap control -->

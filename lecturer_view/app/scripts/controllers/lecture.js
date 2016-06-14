@@ -43,6 +43,12 @@ app.controller('LectureCtrl', function($scope, $window, $location, $http){
   $scope.next = function(){
     return $http.get('http://127.0.0.1:8000/slides/lecture/go_next_page/');
   };
+  $scope.get_mood = function(){
+    return $http.get('http://127.0.0.1:8000/slides/lecture/get_mood/');
+  };
+  $scope.curr = function(){
+    return $http.get('http://127.0.0.1:8000/slides/lecture/get_curr_page/');
+  };
   $scope.goto_questions = function (){
     $location.path('/questions');
   }
