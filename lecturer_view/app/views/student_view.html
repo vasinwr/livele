@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="styles/student_view.css">
 <div id="student_view" ng-controller="StudentViewCtrl">
     <!-- Top half -->
-    <div class="row" ng-init="get_mood()">
+    <div class="row" ng-init="update_question()">
       <div class="col-lg-6">
         <canvas id="pdfviewer"></canvas>
         <div class="Buttons">
@@ -40,9 +40,9 @@
       <div class="col-lg-6">
         <div class="Rightpage-Container">
           <p class="lead"> Questions </p> 
-          <p class="lead normal-font" ng-repeat="q in ques">
-            <span class="lead normal-font">{{ q.question }} - {{ q.votes }}</span>
-            <button ng-click="upvote($index)"><i class="fa fa-thumbs-up" aria-hidden="true"></i></button>
+          <p class="lead normal-font" ng-repeat="q in ques track by q.id">
+            <span class="lead normal-font">{{ q.text }} - {{ q.votes }}</span>
+            <button ng-click="upvote(q.id)"><i class="fa fa-thumbs-up" aria-hidden="true"></i></button>
           </p>
         </div>
         <form role="form" ng-submit="addQuestion()">
@@ -62,6 +62,16 @@
           document.getElementById('red_bar').style.width = data.red_bar + '%';
           document.getElementById('green_bar').style.width = data.green_bar + '%';
         }
+        if(data.type == 'question'){
+          // call controller function: update_question()
+          scope.$apply(function(){
+            scope.update_question();
+          });
+        }
+        if(data.type == 'nav'){
+          onFollowPage();
+        }
+
 
       }
     </script>
@@ -159,6 +169,7 @@
       scope.prev().success(function(data){
        pageNum = data.page
        queueRenderPage(pageNum);
+       scope.update_question()
        console.log('prev');
       });
   });
@@ -177,7 +188,24 @@
       scope.next().success(function(data){
        pageNum = data.page
        queueRenderPage(pageNum);
+       scope.update_question()
        console.log('next');
+      });
+  });
+  }
+
+// follow lecturer current page
+  function onFollowPage() {
+
+    var scope = angular.element(document.getElementById('student_view')).scope();
+  scope.$apply(function(){
+      scope.follow().success(function(data){
+       if (data.page != 0) {
+        pageNum = data.page
+        queueRenderPage(pageNum);
+        scope.update_question()
+        console.log('follow');
+       }
       });
   });
   }

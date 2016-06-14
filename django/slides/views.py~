@@ -204,8 +204,9 @@ def get_page_questions(request):
 # returns list of questions on user's page on the pdf, can be used q.pk, q.fields.pk, q.fields.vote
     current = get_object_or_404(Current, owner = request.token.user, active=1)
     curr_qs = Question.objects.filter(pdf = current.pdf, page = current.page)
-    displayQ = serializers.serialize("json", curr_qs.annotate(votes = Count('question_vote')).order_by('-votes'))
-    return JsonResponse({'questions': displayQ}, safe=False)
+    qs = curr_qs.annotate(votes = Count('question_vote')).order_by('-votes').values()
+    displayQ = json.dumps(list(qs), cls=DjangoJSONEncoder)
+    return JsonResponse(displayQ, safe=False)
 
 
 
@@ -386,21 +387,14 @@ def question(request):
         ques = request.body
 
     if (current.pdf.current_page >= current.page):
-        dummy = Question(user = request.token.user, pdf = current.pdf, page = current.page, text = ques)
-        dummy.save()
-<<<<<<< HEAD
-        question = QuestionForm(request.POST, instance = dummy)
-        question.save()
+        q = Question(user = request.token.user, pdf = current.pdf, page = current.page, text = ques)
+        q.save()
         notification = {
             "type": 'question',
         }
         Channel_Group(str(current.pdf.pk)).send({
             "text": json.dumps(notification),
         })
-=======
-#        question = QuestionForm(request.POST, instance = dummy)
-#        question.save()
->>>>>>> 02e9b1ad9569b5cf977f7b5deb5f8689349a1d3d
         return JsonResponse({'ack':True})
     else:
         pass

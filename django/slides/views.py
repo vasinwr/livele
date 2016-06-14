@@ -204,8 +204,9 @@ def get_page_questions(request):
 # returns list of questions on user's page on the pdf, can be used q.pk, q.fields.pk, q.fields.vote
     current = get_object_or_404(Current, owner = request.token.user, active=1)
     curr_qs = Question.objects.filter(pdf = current.pdf, page = current.page)
-    displayQ = serializers.serialize("json", curr_qs.annotate(votes = Count('question_vote')).order_by('-votes'))
-    return JsonResponse({'questions': displayQ}, safe=False)
+    qs = curr_qs.annotate(votes = Count('question_vote')).order_by('-votes').values()
+    displayQ = json.dumps(list(qs), cls=DjangoJSONEncoder)
+    return JsonResponse(displayQ, safe=False)
 
 
 
@@ -289,7 +290,6 @@ def go_next_page(request):
         current.pdf.save()
         notification = {
             "type": 'nav',
-            "nav": 'next',
         }
         Channel_Group(str(current.pdf.pk)).send({
            "text": json.dumps(notification),
@@ -311,7 +311,6 @@ def go_prev_page(request):
           current.pdf.save()
           notification = {
               "type": 'nav',
-              "nav": 'prev',
           }
           Channel_Group(str(current.pdf.pk)).send({
              "text": json.dumps(notification),
