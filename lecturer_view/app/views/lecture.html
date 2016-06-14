@@ -138,7 +138,7 @@ var al = function al(){
         if(data.type == 'speed'){
             //data.fast , data.slow
           scope.$apply(function(){
-            scope.update_speed(data.fast, data.slow);
+            scope.update_speed(data.slow, data.fast);
           });
         }
         if(data.type == 'nav'){

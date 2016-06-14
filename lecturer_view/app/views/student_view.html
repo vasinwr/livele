@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="styles/student_view.css">
 <div id="student_view" ng-controller="StudentViewCtrl" ng-init="check_speed()">
     <!-- Top half -->
-    <div class="row" ng-init="update_question();ready=true">
+    <div class="row" ng-init="update_question();ready=true; check_speed()">
       <div class="col-lg-6">
         <canvas id="pdfviewer"></canvas>
         <div class="Buttons">
