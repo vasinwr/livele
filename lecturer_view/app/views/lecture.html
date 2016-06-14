@@ -1,4 +1,4 @@
-<div id="lecturer_view" ng-controller="LectureCtrl" ng-init="update_question()">
+<div id="lecturer_view" ng-controller="LectureCtrl" ng-init="update_question(); get_speed()">
     <!-- Top half -->
     <div class="Top-Half">
     
@@ -45,16 +45,16 @@
             <p class="lead bigger-font"><u>summary</u></p>
             <div id="summary-container"> 
               <div class="summary-icon">
-                <i class="fa fa-diamond" style="font-size: 40px" aria-hidden="true"></i>
-                <p> super x14 </p>
+                <i class="fa fa-flash" style="font-size: 40px" aria-hidden="true"></i>
+                <p> too fast x {{fast}} </p>
               </div> 
               <div class="summary-icon">
-                <i class="fa fa-flash" style="font-size: 40px"aria-hidden="true"></i>
-                <p> too fast x5 </p>
+                <i class="fa fa-hourglass-end" style="font-size: 40px"aria-hidden="true"></i>
+                <p> too slow x {{ slow }} </p>
               </div> 
               <div class="summary-icon">
-                <i class="fa fa-deaf" style="font-size: 40px"aria-hidden="true"></i>
-                <p> i'm lost x2 </p>
+                <i class="fa fa-users" style="font-size: 40px"aria-hidden="true"></i>
+                <p> active x </p>
               </div> 
             </div>
           </div>
@@ -137,9 +137,9 @@ var al = function al(){
         }
         if(data.type == 'speed'){
             //data.fast , data.slow
-        }
-        if(data.type == 'summary'){
-          // call controller function: update_summary(data.summary)
+          scope.$apply(function(){
+            scope.update_speed(data.fast, data.slow);
+          });
         }
         if(data.type == 'nav'){
           // ignore

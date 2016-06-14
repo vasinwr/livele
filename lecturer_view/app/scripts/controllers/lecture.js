@@ -19,6 +19,9 @@ app.controller('LectureCtrl', function($scope, $window, $location, $http){
   $scope.close_hover =false ;
   $scope.ques = [];
 
+  $scope.slow = 0;
+  $scope.fast = 0;
+
   var ctrl = $scope;
   $scope.update_question = function(){
     console.log('update q called')
@@ -51,5 +54,15 @@ app.controller('LectureCtrl', function($scope, $window, $location, $http){
   };
   $scope.goto_questions = function (){
     $location.path('/questions');
+  };
+  $scope.get_speed = function(){
+    $http.get('http://127.0.0.1:8000/slides/lecture/get_speed/').success(function(data){
+      ctrl.slow  = eval(data).slow;
+      ctrl.fast  = eval(data).fast;
+    });
+  }
+  $scope.update_speed = function(slow,fast){
+    ctrl.slow = slow;
+    ctrl.fast = fast; 
   }
 });

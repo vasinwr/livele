@@ -7,6 +7,9 @@ app.controller('StudentViewCtrl', function($scope, $window, $location, $http){
   $scope.right_hover = false;
   $scope.current = false;
   $scope.toggle_follow = true;
+  //fast/slow needs to get from backend not false
+  $scope.fast_clicked = false;
+  $scope.slow_clicked = false;
 
   $scope.backhome = function(){
     $location.path('/mainmenu');
@@ -40,10 +43,34 @@ app.controller('StudentViewCtrl', function($scope, $window, $location, $http){
   $scope.unhappy = function(){
     return $http.get('http://127.0.0.1:8000/slides/lecture/vote_down/');
   };
+  $scope.check_speed = function(){
+    $http.get('http://127.0.0.1:8000/slides/lecture/check_speed/').success(function(data){
+       var st = eval(data);
+       console.log(st);
+       if(st == 0){
+         ctrl.fast_clicked = false;
+         ctrl.slow_clicked = false;
+       }else if(st == 1){
+         ctrl.fast_clicked = false;
+         ctrl.slow_clicked = true;
+       }else if(st == 2){
+         ctrl.fast_clicked = true;
+         ctrl.slow_clicked = false;
+       }
+    });
+  };
   $scope.slow = function(){
+    ctrl.slow_clicked = !ctrl.slow_clicked;
+    if(ctrl.fast_clicked){
+      ctrl.fast_clicked = false;
+    }
     return $http.get('http://127.0.0.1:8000/slides/lecture/too_slow/');
   };
   $scope.fast = function(){
+    ctrl.fast_clicked = !ctrl.fast_clicked;
+    if(ctrl.slow_clicked){
+      ctrl.slow_clicked = false;
+    }
     return $http.get('http://127.0.0.1:8000/slides/lecture/too_fast/');
   };
   $scope.get_mood = function(){

@@ -1,5 +1,5 @@
 <link rel="stylesheet" href="styles/student_view.css">
-<div id="student_view" ng-controller="StudentViewCtrl">
+<div id="student_view" ng-controller="StudentViewCtrl" ng-init="check_speed()">
     <!-- Top half -->
     <div class="row" ng-init="update_question();ready=true">
       <div class="col-lg-6">
@@ -26,8 +26,8 @@
         <div class="Vote-Buttons">
           <a class="btn btn-info" style="color:#1a3740;" ng-click="happy()"><i class="fa fa-smile-o fa-3x" aria-hidden="true"></i></a>
           <a class="btn btn-warning" style="color:#5a411e;" ng-click="unhappy()"><i class="fa fa-frown-o fa-3x" aria-hidden="true"></i></a>
-          <button ng-click="slow()">Too Slow</button>
-          <button ng-click="fast()">Too Fast</button>
+          <a class="btn btn-primary" ng-class="{red:slow_clicked}" ng-click="slow()">Too Slow</a>
+          <a class="btn btn-primary" ng-class="{red:fast_clicked}" ng-click="fast()">Too Fast</a>
         </div>
         <div class="Bar-Container">
           <p class="lead">Current class status</p>
