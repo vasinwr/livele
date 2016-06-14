@@ -40,6 +40,12 @@ app.controller('StudentViewCtrl', function($scope, $window, $location, $http){
   $scope.unhappy = function(){
     return $http.get('http://127.0.0.1:8000/slides/lecture/vote_down/');
   };
+  $scope.slow = function(){
+    return $http.get('http://127.0.0.1:8000/slides/lecture/too_slow/');
+  };
+  $scope.fast = function(){
+    return $http.get('http://127.0.0.1:8000/slides/lecture/too_fast/');
+  };
   $scope.get_mood = function(){
     return $http.get('http://127.0.0.1:8000/slides/lecture/get_mood/');
   };
@@ -55,6 +61,4 @@ app.controller('StudentViewCtrl', function($scope, $window, $location, $http){
   $scope.follow = function(){
     return $http.get('http://127.0.0.1:8000/slides/lecture/go_curr_page/');
   };
-  $scope.fast = false;
-  $scope.slow = false;
 });

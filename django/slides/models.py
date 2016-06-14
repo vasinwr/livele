@@ -74,27 +74,13 @@ class Votes(models.Model):
     def __str__(self):
         return str(self.user) +' '+ str(self.pdf) +' page'+ str(self.page)  + (' happy' if (self.value == 0) else ' unhappy')
 
-    def send_notif():
-        notification = {
-            "green_bar": 100,
-            "red_bar": 0,
-        }
-        Channel_Group("all").send({
-            "text": json.dumps(notification),
-        })
+class Speed(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    pdf = models.ForeignKey(PDF, on_delete=models.CASCADE)
+    value = models.IntegerField(default=0)
 
-
-    def send_notification(self, votes):
-        good = votes['good'] * 100 / votes['total']
-        bad = votes['bad'] * 100 / votes['total']
-        notification = {
-            "green_bar": good,
-            "red_bar": bad,
-        }
-        Channel_Group("all").send({
-            "text": json.dumps(notification),
-        })
-
+    def __str__(self):
+        return str(self.user) +' '+ str(self.pdf) + (' slow' if (self.value == 0) else ' fast')
 
 class Question(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
