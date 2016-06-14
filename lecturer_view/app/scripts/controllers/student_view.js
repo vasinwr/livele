@@ -11,6 +11,7 @@ app.controller('StudentViewCtrl', function($scope, $window, $location, $http){
   $scope.backhome = function(){
     $location.path('/mainmenu');
   }
+  var ctrl = $scope;
 
   $scope.ques = [];
 

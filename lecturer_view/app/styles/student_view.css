@@ -68,6 +68,10 @@ html, body{
   color: #777;
 }
 
+#curr:hover{
+  background-color:#ADDDFF;
+}
+
 .Rightpage-Container {
   overflow: scroll;
   position: relative;
@@ -118,4 +122,12 @@ html, body{
 #question {
   width: 100%;
   height: 100px;
+}
+
+.following {
+  color: #59b2ff !IMPORTANT;
+}
+
+.thumb:hover{
+  color: #4595ff;
 }
