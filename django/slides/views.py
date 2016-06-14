@@ -407,10 +407,14 @@ def too_slow(request):
 
     try:
         s = Speed.objects.get(user = request.token.user, pdf = current.pdf)
-        s.value = 0
+        if (s.value == 0):
+            s.delete()
+        else:
+            s.value = 0
+            s.save()
     except Speed.DoesNotExist:
         s = Speed(user = request.token.user, pdf = current.pdf, value = 0)
-    s.save()
+        s.save()
     send_speed(current.pdf)
 
     return JsonResponse({'ack':True})
@@ -425,10 +429,14 @@ def too_fast(request):
 
     try:
         s = Speed.objects.get(user = request.token.user, pdf = current.pdf)
-        s.value = 1
+        if (s.value == 1):
+            s.delete()
+        else:
+            s.value = 1
+            s.save()
     except Speed.DoesNotExist:
         s = Speed(user = request.token.user, pdf = current.pdf, value = 1)
-    s.save()
+        s.save()
     send_speed(current.pdf)
 
     return JsonResponse({'ack':True})
