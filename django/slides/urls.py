@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^lecture/get_curr_page/', views.get_curr_page, name='get curr page'),
     url(r'^lecture/get_mood/', views.get_mood, name='get mood'),
     url(r'^lecture/get_speed/', views.get_speed, name='get speed'),
+    url(r'^lecture/check_speed/', views.get_speed, name='check speed'),
     url(r'^lecture/go_next_page/', views.go_next_page, name='go next page'),
     url(r'^lecture/go_prev_page/', views.go_prev_page, name='go previous page'),
     url(r'^lecture/go_curr_page/', views.go_curr_page, name='go current page'),
