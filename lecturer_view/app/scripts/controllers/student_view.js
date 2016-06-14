@@ -51,12 +51,7 @@ app.controller('StudentViewCtrl', function($scope, $window, $location, $http){
     return $http.get('http://127.0.0.1:8000/slides/lecture/go_next_page/');
   };
   $scope.follow = function(){
-    if ($scope.toggle_follow) {
-      return $http.get('http://127.0.0.1:8000/slides/lecture/go_curr_page/');
-    }
-    else {
-      return 0;
-    }
+    return $http.get('http://127.0.0.1:8000/slides/lecture/go_curr_page/');
   };
   $scope.fast = false;
   $scope.slow = false;

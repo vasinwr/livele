@@ -411,6 +411,12 @@ def qvote(request, question):
     except Question_Vote.DoesNotExist:
         v = Question_Vote(user = request.token.user, question = q)
         v.save()
+        notification = {
+            "type": 'question',
+        }
+        Channel_Group(str(current.pdf.pk)).send({
+            "text": json.dumps(notification),
+        })
 
     return JsonResponse({'ack':question})
 
