@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="styles/student_view.css">
 <div id="student_view" ng-controller="StudentViewCtrl">
     <!-- Top half -->
-    <div class="row" ng-init="update_question()">
+    <div class="row" ng-init="update_question();ready=true">
       <div class="col-lg-6">
         <canvas id="pdfviewer"></canvas>
         <div class="Buttons">
@@ -61,11 +61,14 @@
       socket.onmessage = function(message){
         var data = JSON.parse(message.data);
         if(data.type == 'bar'){
-          document.getElementById('red_bar').style.width = data.red_bar + '%';
-          document.getElementById('green_bar').style.width = data.green_bar + '%';
+          if (data.page == pageNum){
+            document.getElementById('red_bar').style.width = data.red_bar + '%';
+            document.getElementById('green_bar').style.width = data.green_bar + '%';
+          }
         }
         if(data.type == 'question'){
           // call controller function: update_question()
+          var scope = angular.element(document.getElementById('student_view')).scope();
           scope.$apply(function(){
             scope.update_question();
           });
@@ -103,6 +106,7 @@
   // PDFJS.workerSrc = '../../build/pdf.worker.js';
 
   var follow = true;
+  var ready = false;
   var pdfDoc = null,
       pageNum = 1,
       pageRendering = false,
@@ -172,7 +176,11 @@
       scope.prev().success(function(data){
        pageNum = data.page
        queueRenderPage(pageNum);
-       scope.update_question()
+       scope.update_question();
+        scope.get_mood().success(function(data){
+            document.getElementById('red_bar').style.width = data.bad + '%';
+            document.getElementById('green_bar').style.width = data.good + '%';
+        });
        console.log('prev');
       });
   });
@@ -191,7 +199,11 @@
       scope.next().success(function(data){
        pageNum = data.page
        queueRenderPage(pageNum);
-       scope.update_question()
+       scope.update_question();
+        scope.get_mood().success(function(data){
+            document.getElementById('red_bar').style.width = data.bad + '%';
+            document.getElementById('green_bar').style.width = data.good + '%';
+        });
        console.log('next');
       });
   });
@@ -205,7 +217,11 @@
         scope.follow().success(function(data){
           pageNum = data.page
           queueRenderPage(pageNum);
-          scope.update_question()
+          scope.update_question();
+          scope.get_mood().success(function(data){
+            document.getElementById('red_bar').style.width = data.bad + '%';
+            document.getElementById('green_bar').style.width = data.good + '%';
+          });
           console.log('follow');
         });
       });
@@ -226,7 +242,19 @@
    */
   PDFJS.getDocument(docInitParams).then(function (pdfDoc_) {
     pdfDoc = pdfDoc_;
-    renderPage(pageNum);
+    var scope = angular.element(document.getElementById('student_view')).scope();
+    scope.$apply(function(){
+      scope.curr().success(function(data){
+       pageNum = data.page
+       renderPage(pageNum);
+       console.log('init page = '+ pageNum);
+        scope.get_mood().success(function(data){
+            document.getElementById('red_bar').style.width = data.bad + '%';
+            document.getElementById('green_bar').style.width = data.good + '%';
+        });
+       console.log('init');
+      });
+    });
   });
 </script>
 

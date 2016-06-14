@@ -15,7 +15,7 @@ app.controller('StudentViewCtrl', function($scope, $window, $location, $http){
 
   $scope.ques = [];
 
-  $scope.question = ""
+  $scope.question = ''
   
   $scope.addQuestion = function() {
     $http.post('http://127.0.0.1:8000/slides/lecture/question/', $scope.question).success(function(data){
@@ -26,7 +26,6 @@ app.controller('StudentViewCtrl', function($scope, $window, $location, $http){
 
   $scope.upvote = function(pk) {
     $http.get('http://127.0.0.1:8000/slides/lecture/qvote/'+pk).success(function(data){
-      $scope.update_question();
     });
   };
   $scope.update_question = function(){
@@ -43,6 +42,9 @@ app.controller('StudentViewCtrl', function($scope, $window, $location, $http){
   };
   $scope.get_mood = function(){
     return $http.get('http://127.0.0.1:8000/slides/lecture/get_mood/');
+  };
+  $scope.curr = function(){
+    return $http.get('http://127.0.0.1:8000/slides/lecture/get_curr_page/');
   };
   $scope.prev = function(){
     return $http.get('http://127.0.0.1:8000/slides/lecture/go_prev_page/');

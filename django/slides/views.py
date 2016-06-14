@@ -246,8 +246,8 @@ def get_mood(request):
             v = Votes(user = request.token.user, pdf = curr_pdf, page = current.page, value = 0)
             v.save()
 
-    good = Votes.objects.filter(pdf = curr_pdf, value = 0).count()
-    bad = Votes.objects.filter(pdf = curr_pdf,  value = 1).count()
+    good = Votes.objects.filter(pdf = curr_pdf, page=current.page, value = 0).count()
+    bad = Votes.objects.filter(pdf = curr_pdf, page=current.page, value = 1).count()
     total = good + bad
     if (total == 0):
         total = 1
@@ -258,8 +258,8 @@ def get_mood(request):
 def send_mood(pdf, page):
 # sends mood status as percentages
 
-    good = Votes.objects.filter(pdf = pdf, value = 0).count()
-    bad = Votes.objects.filter(pdf = pdf,  value = 1).count()
+    good = Votes.objects.filter(pdf = pdf, page=page, value = 0).count()
+    bad = Votes.objects.filter(pdf = pdf, page=page, value = 1).count()
     total = good + bad
     if (total == 0):
         total = 1
@@ -414,7 +414,7 @@ def qvote(request, question):
         notification = {
             "type": 'question',
         }
-        Channel_Group(str(current.pdf.pk)).send({
+        Channel_Group(str(q.pdf.pk)).send({
             "text": json.dumps(notification),
         })
 
