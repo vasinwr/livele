@@ -7,8 +7,20 @@ app.controller('questionCtrl', function($scope, $http, $window, $location, AuthS
     $location.path('/');
     return;
   }
-  $scope.questions = [1,2,3];
+
+  $scope.questions = [];
+  var ctrl = $scope;
+
   $scope.back = function(){
     $location.path('/lecture');
+  };
+  $scope.update_question = function(){
+    console.log('update q called');
+    $http.get('http://127.0.0.1:8000/slides/lecture/show_questions/').success(function(data){
+      ctrl.questions = eval(data)
+    });
+  };
+  $scope.delete_question = function(index){
+    alert(index);
   }
 });

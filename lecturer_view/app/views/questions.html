@@ -1,4 +1,9 @@
-<div ng-repeat="q in questions">
-  {{q}}
+<div ng-init="update_question()">
+  <h3 style="margin-top:0px;"> All questions </h3>
+  <div ng-repeat="q in questions | orderBy:'page' track by $index">
+    On page {{q.page}}: {{q.text}}, with {{q.votes}} votes
+    <!--span class="red" ng-click=delete_question($index)> delete </span-->
+  </div>
+  <br>
+  <a class="btn btn-info" ng-click = back()> back</a>
 </div>
-<div ng-click = back()> back</div>
