@@ -46,11 +46,15 @@ app.controller('StudentViewCtrl', function($scope, $window, $location, $http){
   $scope.check_speed = function(){
     $http.get('http://127.0.0.1:8000/slides/lecture/check_speed/').success(function(data){
        var st = eval(data);
-       if(st.fast == 1){
-         ctrl.fast_clicked = true;
-       }
-       if(st.slow == 1){
+       if(st.speed == 0){
+         ctrl.fast_clicked = false;
+         ctrl.slow_clicked = false;
+       }else if(st.speed == 1){
+         ctrl.fast_clicked = false;
          ctrl.slow_clicked = true;
+       }else if(st.speed == 2){
+         ctrl.fast_clicked = true;
+         ctrl.slow_clicked = false;
        }
     });
   };
