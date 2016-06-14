@@ -3,7 +3,7 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse;
 from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate, login
-from .models import Current, PDF, Votes, PDFForm, Question, QuestionForm, Question_Vote
+from .models import Current, PDF, Votes, PDFForm, Question, QuestionForm, Question_Vote, Speed
 from django.contrib.auth.models import User, Group
 from channels import Group as Channel_Group
 from django.conf import settings
@@ -275,6 +275,32 @@ def send_mood(pdf, page):
        "text": json.dumps(notification),
     })
 
+@csrf_exempt
+@token_required
+def get_speed(request):
+# return speed status
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
+
+    slow = Speed.objects.filter(pdf = current.pdf, value = 0).count()
+    fast = Speed.objects.filter(pdf = current.pdf, value = 1).count()
+    
+    return JsonResponse({'slow': slow, 'fast': fast})
+
+def send_speed(pdf):
+# sends speed status
+
+    slow = Speed.objects.filter(pdf = pdf, value = 0).count()
+    fast = Speed.objects.filter(pdf = pdf, value = 1).count()
+    
+    notification = {
+        "type": 'speed',
+        "slow": slow,
+        "fast": fast,
+    }
+    Channel_Group(str(pdf.pk)).send({
+       "text": json.dumps(notification),
+    })
+
 
 
 @csrf_exempt
@@ -371,6 +397,41 @@ def vote_down(request):
     else:
         pass    
     return JsonResponse({'ack':False})
+
+@csrf_exempt
+@token_required
+def too_slow(request):
+# user votes up on his current slide. 
+# returns true if voted, false otherwise.
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
+
+    try:
+        s = Speed.objects.get(user = request.token.user, pdf = current.pdf)
+        s.value = 0
+    except Speed.DoesNotExist:
+        s = Speed(user = request.token.user, pdf = current.pdf, value = 0)
+    s.save()
+    send_speed(current.pdf)
+
+    return JsonResponse({'ack':True})
+
+
+@csrf_exempt
+@token_required
+def too_fast(request):
+# user votes up on his current slide. 
+# returns true if voted, false otherwise.
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
+
+    try:
+        s = Speed.objects.get(user = request.token.user, pdf = current.pdf)
+        s.value = 1
+    except Speed.DoesNotExist:
+        s = Speed(user = request.token.user, pdf = current.pdf, value = 1)
+    s.save()
+    send_speed(current.pdf)
+
+    return JsonResponse({'ack':True})
 
 
 @csrf_exempt
