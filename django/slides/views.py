@@ -286,6 +286,21 @@ def get_speed(request):
     
     return JsonResponse({'slow': slow, 'fast': fast})
 
+@csrf_exempt
+@token_required
+def check_speed(request):
+# return speed status for this user. 0 is nothing, 1 is slow, 2 is fast.
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
+
+    status = 0
+    try:
+        s = Speed.objects.get(user = request.token.user, pdf = current.pdf)
+        status = s.value +1
+    except Speed.DoesNotExist:
+        pass
+    
+    return JsonResponse({'speed': status})
+
 def send_speed(pdf):
 # sends speed status
 
