@@ -408,7 +408,7 @@ def too_slow(request):
     try:
         s = Speed.objects.get(user = request.token.user, pdf = current.pdf)
         s.value = 0
-    except Votes.DoesNotExist:
+    except Speed.DoesNotExist:
         s = Speed(user = request.token.user, pdf = current.pdf, value = 0)
     s.save()
     send_speed(current.pdf)
@@ -426,7 +426,7 @@ def too_fast(request):
     try:
         s = Speed.objects.get(user = request.token.user, pdf = current.pdf)
         s.value = 1
-    except Votes.DoesNotExist:
+    except Speed.DoesNotExist:
         s = Speed(user = request.token.user, pdf = current.pdf, value = 1)
     s.save()
     send_speed(current.pdf)
