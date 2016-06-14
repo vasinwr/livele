@@ -9,17 +9,17 @@
                                    ng-mouseover="sides.left_hover = true"
                                    ng-mouseleave="sides.left_hover = false"
                                    ng-click="toggle_follow = false"
-                                   onclick="onPrevPage()">
+                                   onclick="navclicked();onPrevPage()">
             <div id="prev"><i class="fa fa-angle-left fa-2x" aria-hidden="true"></i></div>
           </div>
           <div class="Middle-Button" ng-click="current"> 
-            <div id="curr" ng-class="{following:toggle_follow}" ng-click="toggle_follow = !toggle_follow">Current</div>
+            <div id="curr" ng-class="{following:toggle_follow}" ng-click="toggle_follow = !toggle_follow" onclick="toggleFollowPage()">Live Mode</div>
           </div>
           <div class="Right-Button" ng-class="{'Side-Hover' : sides.right_hover}" 
                                     ng-mouseover="sides.right_hover = true"
                                     ng-mouseleave="sides.right_hover = false"
                                     ng-click="toggle_follow = false"
-                                    onclick="onNextPage()">
+                                    onclick="navclicked();onNextPage()">
             <div id="next"><i class="fa fa-angle-right fa-2x" aria-hidden="true"></i></div>
           </div>
         </div>
@@ -102,6 +102,7 @@
   //
   // PDFJS.workerSrc = '../../build/pdf.worker.js';
 
+  var follow = true;
   var pdfDoc = null,
       pageNum = 1,
       pageRendering = false,
@@ -198,18 +199,26 @@
 
 // follow lecturer current page
   function onFollowPage() {
-
-    var scope = angular.element(document.getElementById('student_view')).scope();
-  scope.$apply(function(){
-      scope.follow().success(function(data){
-       if (data.page != 0) {
-        pageNum = data.page
-        queueRenderPage(pageNum);
-        scope.update_question()
-        console.log('follow');
-       }
+    if (follow) {
+      var scope = angular.element(document.getElementById('student_view')).scope();
+      scope.$apply(function(){
+        scope.follow().success(function(data){
+          pageNum = data.page
+          queueRenderPage(pageNum);
+          scope.update_question()
+          console.log('follow');
+        });
       });
-  });
+    }
+  }
+// toggle follow lecturer current page
+  function toggleFollowPage() {
+    follow = !follow;
+    onFollowPage();
+  }
+// toggle follow lecturer current page
+  function navclicked() {
+    follow = false;
   }
 
   /**

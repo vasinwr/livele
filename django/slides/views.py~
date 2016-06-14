@@ -290,7 +290,6 @@ def go_next_page(request):
         current.pdf.save()
         notification = {
             "type": 'nav',
-            "nav": 'next',
         }
         Channel_Group(str(current.pdf.pk)).send({
            "text": json.dumps(notification),
@@ -312,7 +311,6 @@ def go_prev_page(request):
           current.pdf.save()
           notification = {
               "type": 'nav',
-              "nav": 'prev',
           }
           Channel_Group(str(current.pdf.pk)).send({
              "text": json.dumps(notification),
