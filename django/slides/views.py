@@ -283,8 +283,9 @@ def get_speed(request):
 
     slow = Speed.objects.filter(pdf = current.pdf, value = 0).count()
     fast = Speed.objects.filter(pdf = current.pdf, value = 1).count()
+    au = Current.objects.filter(pdf = current.pdf).count()
     
-    return JsonResponse({'slow': slow, 'fast': fast})
+    return JsonResponse({'audience': au-1, 'slow': slow, 'fast': fast})
 
 @csrf_exempt
 @token_required
@@ -306,9 +307,11 @@ def send_speed(pdf):
 
     slow = Speed.objects.filter(pdf = pdf, value = 0).count()
     fast = Speed.objects.filter(pdf = pdf, value = 1).count()
+    au = Current.objects.filter(pdf = current.pdf).count()
     
     notification = {
         "type": 'speed',
+        "audience": au-1,
         "slow": slow,
         "fast": fast,
     }
