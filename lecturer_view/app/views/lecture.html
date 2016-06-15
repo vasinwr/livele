@@ -294,9 +294,16 @@ var x = function(){alert(angular.element(document.getElementById('lecturer_view'
     });
   });
 </script>
-    <!-- mousetrap control -->
-    <!--script>
-      Mousetrap.bind(['right','space'], onNextPage());
-      Mousetrap.bind('left', onPrevPage());
-    </script-->
+
+<!-- mousetrap control -->
+<script>
+  var MTonNext = function(){
+    onNextPage();
+  };
+  var MTonPrev = function(){
+    onPrevPage();
+  };
+    Mousetrap.bind(['right','space'], MTonNext);
+    Mousetrap.bind('left', MTonPrev);
+</script>
 
