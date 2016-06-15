@@ -21,10 +21,10 @@ app.controller('LectureCtrl', function($scope, $window, $location, $http){
 
   $scope.slow = 0;
   $scope.fast = 0;
+  $scope.audience = 0;
 
   var ctrl = $scope;
   $scope.update_question = function(){
-    console.log('update q called')
     $http.get('http://127.0.0.1:8000/slides/lecture/show_questions/').success(function(data){
       ctrl.ques = eval(data)
     });
@@ -57,12 +57,15 @@ app.controller('LectureCtrl', function($scope, $window, $location, $http){
   };
   $scope.get_speed = function(){
     $http.get('http://127.0.0.1:8000/slides/lecture/get_speed/').success(function(data){
-      ctrl.slow  = eval(data).slow;
-      ctrl.fast  = eval(data).fast;
+      var d = eval(data);
+      ctrl.slow  = d.slow;
+      ctrl.fast  = d.fast;
+      ctrl.audience = d.audience;
     });
   }
-  $scope.update_speed = function(slow,fast){
+  $scope.update_speed = function(slow,fast, audience){
     ctrl.slow = slow;
     ctrl.fast = fast; 
+    ctrl.audience = d.audience;
   }
 });
