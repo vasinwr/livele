@@ -307,7 +307,7 @@ def send_speed(pdf):
 
     slow = Speed.objects.filter(pdf = pdf, value = 0).count()
     fast = Speed.objects.filter(pdf = pdf, value = 1).count()
-    au = Current.objects.filter(pdf = current.pdf).count()
+    au = Current.objects.filter(pdf = pdf).count()
     
     notification = {
         "type": 'speed',
