@@ -73,7 +73,8 @@
         </div>
         <div id="menu-popup-navi-container" ng-mouseover="navi_hover=true"
                                             ng-mouseleave="navi_hover=false">
-          <div id="menu-popup-navi-inner" ng-class="{'menu-navi-hover': !navi_hover}">
+          <div id="menu-popup-navi-inner" ng-class="{'menu-navi-hover': !navi_hover}"
+                                          ng-click="clicked=false; fullscreen=true;">
           <p class="lead"><br /> <i class="fa fa-compass fa-2x" aria-hidden="true"></i> </p>
           </div>
         </div>
@@ -302,13 +303,20 @@ var x = function(){alert(angular.element(document.getElementById('lecturer_view'
 
 <!-- mousetrap control -->
 <script>
-  var MTonNext = function(){
+  var MT_on_next = function(){
     onNextPage();
   };
-  var MTonPrev = function(){
+  var MT_on_prev = function(){
     onPrevPage();
   };
-    Mousetrap.bind(['right','space'], MTonNext);
-    Mousetrap.bind('left', MTonPrev);
+  var MT_esc = function(){
+    var scope = angular.element(document.getElementById('lecturer_view')).scope();
+    scope.$apply(function(){
+      scope.fullscreen = false;
+    });
+  };
+  Mousetrap.bind(['right','space'], MT_on_next);
+  Mousetrap.bind('left', MT_on_prev);
+  Mousetrap.bind('esc', MT_esc);
 </script>
 
