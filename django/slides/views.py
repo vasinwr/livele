@@ -23,6 +23,19 @@ from django.db import IntegrityError
 from .models import Token
 
 # Create your views here.
+@csrf_exempt
+@token_required
+def clicker_full(request):
+    current = get_object_or_404(Current, owner = request.token.user, active=1)
+    pdf = current.pdf
+    notification = {
+        "type": 'clicker',
+        "nav": 'full',
+    }
+    Channel_Group(str(pdf.pk)).send({
+       "text": json.dumps(notification),
+    })
+    return JsonResponse({'ack':False})
 
 @csrf_exempt
 @token_required

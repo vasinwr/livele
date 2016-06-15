@@ -22,6 +22,7 @@ app.controller('LectureCtrl', function($scope, $window, $location, $http){
   $scope.slow = 0;
   $scope.fast = 0;
   $scope.audience = 0;
+  $scope.fullscreen = false;
 
   var ctrl = $scope;
   $scope.update_question = function(){

@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^clicker_next/', views.clicker_next),
     url(r'^clicker_prev/', views.clicker_prev),
     url(r'^clicker_menu/', views.clicker_menu),
+    url(r'^clicker_full/', views.clicker_full),
 
     url(r'^getpdf/', views.pdf_view),
     url(r'^returnsomejson/', views.returnsomejson),

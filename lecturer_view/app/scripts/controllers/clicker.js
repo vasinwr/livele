@@ -20,6 +20,9 @@ app.controller('ClickerCtrl', function($scope, $window, $location, $http, AuthSe
       }
     );
   };
+  $scope.full = function () {
+    $http.get('http://127.0.0.1:8000/slides/clicker_full/');
+  };
   $scope.next = function () {
     $http.get('http://127.0.0.1:8000/slides/clicker_next/');
   };

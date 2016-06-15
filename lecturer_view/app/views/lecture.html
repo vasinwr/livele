@@ -1,6 +1,6 @@
 <div id="lecturer_view" ng-controller="LectureCtrl" ng-init="update_question(); get_speed()">
     <!-- Top half -->
-    <div class="Top-Half">
+    <div class="Top-Half" ng-class="{full:fullscreen}">
     
       <div class="Left-Container" onclick="onPrevPage()" ng-class="{'Side-Hover' : left_hover}" 
                                   ng-mouseover="left_hover = true"
@@ -8,7 +8,7 @@
                                   >
         <div id="prev"><i class="fa fa-angle-left fa-2x" aria-hidden="true"></i></div>
       </div>
-      <canvas id="pdfviewer"></canvas>
+      <canvas id="pdfviewer" ng-class="{full:fullscreen}"></canvas>
       <div class="Right-Container" onclick="onNextPage()" ng-class="{'Side-Hover' : right_hover}" 
                                   ng-mouseover="right_hover = true"
                                   ng-mouseleave="right_hover = false"
@@ -119,7 +119,12 @@ var al = function al(){
             onNextPage();
           } else if(data.nav == 'prev'){
             onPrevPage();
-          } else if(data.nav == 'menu'){
+          } else if(data.nav == 'full'){
+            scope.$apply(function(){
+              scope.fullscreen = !scope.fullscreen;
+            });
+          } 
+          else if(data.nav == 'menu'){
             scope.$apply(function(){
               scope.clicked = !scope.clicked;
             });
