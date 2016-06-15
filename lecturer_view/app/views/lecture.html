@@ -1,7 +1,7 @@
 <div id="lecturer_view" ng-controller="LectureCtrl" ng-init="update_question(); get_speed()">
     <!-- Top half -->
     <div class="Top-Half" ng-class="{full:fullscreen}">
-    
+      <div id="opacity_filter" ng-show="fullscreen"></div> 
       <div class="Left-Container" onclick="onPrevPage()" ng-class="{'Side-Hover' : left_hover}" 
                                   ng-mouseover="left_hover = true"
                                   ng-mouseleave="left_hover = false"
@@ -98,16 +98,8 @@
     <div class="Background-Dark" ng-show="clicked"></div>
 </div>
 
-    <script> 
-// example of calling controller function from outside controller, click left to try
-var al = function al(){
-  var scope = angular.element(document.getElementById('lecturer_view')).scope();
-  scope.$apply(function(){
-    scope.click('x');
-  });
-}
 
-    </script>
+
     <!-- websocket control -->
     <script>
       console.log('websocket.js used');
@@ -134,6 +126,9 @@ var al = function al(){
         if(data.type == 'bar'){
           document.getElementById('red_bar').style.width = data.red_bar + '%';
           document.getElementById('green_bar').style.width = data.green_bar + '%';
+
+          var ratio_good = data.red_bar/(data.red_bar+data.green_bar);
+          document.getElementById('opacity_filter').style.opacity = ratio_good*2/3;
         }
         if(data.type == 'question'){
           // call controller function: update_question()
@@ -152,9 +147,6 @@ var al = function al(){
         }
       }
     </script>
-  <script>
-var x = function(){alert(angular.element(document.getElementById('lecturer_view')).scope().clicked);};
-  </script>
 
       
   <!-- pdf control -->
@@ -252,8 +244,10 @@ var x = function(){alert(angular.element(document.getElementById('lecturer_view'
         scope.get_mood().success(function(data){
             document.getElementById('red_bar').style.width = data.bad + '%';
             document.getElementById('green_bar').style.width = data.good + '%';
-        });
-       console.log('prev');
+            var ratio_good = data.bad/(data.bad+data.good);
+            document.getElementById('opacity_filter').style.opacity = ratio_good*2/3;
+          });
+         console.log('prev');
       });
   });
   }
@@ -274,6 +268,8 @@ var x = function(){alert(angular.element(document.getElementById('lecturer_view'
         scope.get_mood().success(function(data){
             document.getElementById('red_bar').style.width = data.bad + '%';
             document.getElementById('green_bar').style.width = data.good + '%';
+            var ratio_good = data.bad/(data.bad+data.good);
+            document.getElementById('opacity_filter').style.opacity = ratio_good*2/3;
         });
        console.log('next');
       });
@@ -294,6 +290,8 @@ var x = function(){alert(angular.element(document.getElementById('lecturer_view'
         scope.get_mood().success(function(data){
             document.getElementById('red_bar').style.width = data.bad + '%';
             document.getElementById('green_bar').style.width = data.good + '%';
+            var ratio_good = data.bad/(data.bad+data.good);
+            document.getElementById('opacity_filter').style.opacity = ratio_good*2/3;
         });
        console.log('init');
       });

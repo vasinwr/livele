@@ -16,6 +16,17 @@ html, body{
   z-index:150;
 }
 
+#opacity_filter{
+  position: absolute;
+  background-color: red;
+  opacity: 0.5;
+  left:0px; top:0px; right:0px; bottom: 0px;
+  height:100%;
+  width:100%;
+  z-index:160;
+ 
+}
+
 #bar {
   position: absolute;
   left: 20%;
