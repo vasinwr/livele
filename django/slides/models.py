@@ -34,8 +34,6 @@ def rename(instance, filename):
 
 class PDF(models.Model):
     filename = models.CharField(max_length=200)
-    course = models.ForeignKey(Group, on_delete=models.CASCADE, default = 1)
-    lecturer = models.ForeignKey(User, on_delete=models.CASCADE, default = 1)
     current_page = models.IntegerField(default = 1)
     pdffile = models.FileField(upload_to=rename)
 

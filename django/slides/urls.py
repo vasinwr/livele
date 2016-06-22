@@ -15,6 +15,8 @@ urlpatterns = [
     url(r'^clicker_menu/', views.clicker_menu),
     url(r'^clicker_full/', views.clicker_full),
 
+    url(r'^upload/', views.upload_pdf),
+
     url(r'^getpdf/', views.pdf_view),
     url(r'^returnsomejson/', views.returnsomejson),
 #    url(r'^profile/', views.index),

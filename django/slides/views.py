@@ -98,39 +98,20 @@ def returnsomejson(request):
   #Votes.send_notif()
   return json_response({'x':'something'})
 
-'''
+#upload pdf
 @csrf_exempt
-@token_required
-def course_index(request, course):
-    course_group = Group.objects.get(name = course)
+def upload_pdf(request):
     # Handle file upload
     if request.method == 'POST':
         form = PDFForm(request.POST, request.FILES)
         if form.is_valid():
             pdf = form.save(commit=False)
-            pdf.course = course_group
-            pdf.lecturer = request.token.user
             pdf.save()
-            # Redirect to the document list after POST
-            return HttpResponseRedirect(course)
     else:
         form = PDFForm()  # A empty, unbound form
 
-    # Load documents for the list page
-    documents = PDF.objects.filter(course = course_group)
+    return JsonResponse({'ack':True})
 
-    return render_to_response(
-        'slides/course_index.html',
-        {'documents': documents, 'form': form},
-        context_instance=RequestContext(request)
-    )
-
-    # Render list page with the documents and the form
-    if(request.token.user.groups.filter(name = 'Lecturer').count() == 1):
-        return render(request, 'slides/course_index.html', {'course': course, 'lecturer':True, 'documents': documents, 'form': form})
-    else:
-        return render(request, 'slides/course_index.html', {'course': course, 'documents': documents, 'form': form})
-'''
 
 @csrf_exempt
 @token_required
