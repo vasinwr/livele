@@ -9,8 +9,8 @@ app.config(['$routeProvider','$httpProvider', function($routeProvider, $httpProv
   $httpProvider.interceptors.push('AuthInterceptor');
   $routeProvider
     .when('/', {
-      templateUrl: 'views/auth.html',
-      controller: 'AuthCtrl'
+      templateUrl: 'views/landing.html',
+      controller: 'LandingCtrl'
     })
     .when('/mainmenu', {
       templateUrl: 'views/mainmenu.html',
