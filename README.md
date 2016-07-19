@@ -1,7 +1,7 @@
-# livele
+## livele
 A web application to give presentations and receive live feedback from audiences.
 
-Key features: 
+#Key features: 
 1. show Live presentation slides on audiences page <br />
 2. audiences vote for 'understand' or 'don't understand' and 'too fast' or 'too slow' <br />
 3. audiences can ask questions <br />
